@@ -1,4 +1,4 @@
-const DEPLOY_PATH = process.env.NODE_ENV === "development" ? '/' : process.env.DEPLOY_PATH;
+const DEPLOY_PATH = process.env.NODE_ENV === "development" ? '/' : (process.env.DEPLOY_PATH || '/horison/');
 
 export default {
   // Disable server-side rendering: https://go.nuxtjs.dev/ssr-mode
@@ -72,7 +72,7 @@ export default {
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
     // https://go.nuxtjs.dev/axios
-    '@nuxtjs/axios',
+    //'@nuxtjs/axios',
     // https://go.nuxtjs.dev/pwa
     '@nuxtjs/pwa',
   ],
