@@ -19,35 +19,10 @@
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label for="dari" class="col-sm-4 col-form-label">Dari</label>
+                            <label for="height" class="col-sm-4 col-form-label">Height</label>
                             <div class="col-sm-8">
-                                <input type="text" class="form-control" id="dari" v-model="model.from"
-                                       placeholder="YYYY-MM-dd HH:mm:ss">
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <label for="sampai" class="col-sm-4 col-form-label">Sampai</label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control" id="sampai" v-model="model.to"
-                                       placeholder="YYYY-MM-dd HH:mm:ss">
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <label for="interval" class="col-sm-4 col-form-label">Interval</label>
-                            <div class="col-sm-8">
-                                <div class="input-group mb-3">
-                                    <input type="number" class="form-control" id="interval" v-model="model.interval">
-                                    <div class="input-group-append">
-                                        <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                                            {{units[model.unit].label}}
-                                        </button>
-                                        <ul class="dropdown-menu" style="">
-                                            <li v-for="(v,k) in units"  class="dropdown-item">
-                                                <a @click="model.unit = k" href="javascript:void(0)"><i class="fa fa-check" v-if="model.unit == k"></i>{{v.label}}</a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
+                                <input type="text" class="form-control" id="height" v-model="model.height"
+                                       placeholder="Height">
                             </div>
                         </div>
                         <div class="form-group row">
@@ -155,6 +130,7 @@
                 this.loc = {lat: this.model.lat, lon: this.model.lon};
                 let jd1 = strToJD(this.model.from || moment().format('YYYY-MM-DD [00:00:00]'));
                 let jd2 = strToJD(this.model.to || moment().format('YYYY-MM-DD [23:59:59.999]'));
+                console.log(this.loc, jd1, jd2);
                 if (jd1 && jd2) {
                     let step = this.model.interval * units[this.model.unit].value / (24 * 3600);
                     this.rows = sunList(jd1, jd2, step, toGlobe(this.loc)).map(v => {
@@ -185,7 +161,8 @@
                 return r;
             },
             rowsStr() {
-                let l = [                    
+                let l = [
+                    `(${locToStr(this.loc)})\n\n`,
                     '      Time(UT)      ',
                 ];
 
@@ -195,8 +172,10 @@
                         l.push(col.c);
                     }
                 }
+                let len = l[1].length;
                 l = l.join(' ');
-                l = `(${locToStr(this.loc)})\n\n${l}\n${'*'.padStart(l.length, '*')}\n`;
+
+                l += '\n' + '*'.padStart(len, '*') + '\n';
                 if (this.rows.length) {
                     return l + this.rows.map(row => {
                         let r = [

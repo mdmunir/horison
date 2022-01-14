@@ -5,16 +5,30 @@
                 <div class="row">
                     <div class="col-lg-4 col-sm-12">
                         <div class="form-group row">
+                            <label for="latitude" class="col-sm-4 col-form-label">Latitude</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" id="latitude" v-model="model.lat"
+                                       placeholder="Latitude">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="longitude" class="col-sm-4 col-form-label">Longitude</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" id="longitude" v-model="model.lon"
+                                       placeholder="Longitude">
+                            </div>
+                        </div>
+                        <div class="form-group row">
                             <label for="dari" class="col-sm-4 col-form-label">Dari</label>
                             <div class="col-sm-8">
-                                <input type="text" class="form-control" id="dari" v-model="from"
+                                <input type="text" class="form-control" id="dari" v-model="model.from"
                                        placeholder="YYYY-MM-dd HH:mm:ss">
                             </div>
                         </div>
                         <div class="form-group row">
                             <label for="sampai" class="col-sm-4 col-form-label">Sampai</label>
                             <div class="col-sm-8">
-                                <input type="text" class="form-control" id="sampai" v-model="to"
+                                <input type="text" class="form-control" id="sampai" v-model="model.to"
                                        placeholder="YYYY-MM-dd HH:mm:ss">
                             </div>
                         </div>
@@ -22,14 +36,14 @@
                             <label for="interval" class="col-sm-4 col-form-label">Interval</label>
                             <div class="col-sm-8">
                                 <div class="input-group mb-3">
-                                    <input type="number" class="form-control" id="interval" v-model="interval">
+                                    <input type="number" class="form-control" id="interval" v-model="model.interval">
                                     <div class="input-group-append">
                                         <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                                            {{units[unit].label}}
+                                            {{units[model.unit].label}}
                                         </button>
                                         <ul class="dropdown-menu" style="">
                                             <li v-for="(v,k) in units"  class="dropdown-item">
-                                                <a @click="unit = k" href="javascript:void(0)"><i class="fa fa-check" v-if="unit == k"></i>{{v.label}}</a>
+                                                <a @click="model.unit = k" href="javascript:void(0)"><i class="fa fa-check" v-if="model.unit == k"></i>{{v.label}}</a>
                                             </li>
                                         </ul>
                                     </div>
@@ -67,7 +81,7 @@
 </template>
 
 <script>
-    import {moonList, strToJD, R2D, toGlobe} from '@/libs/horison';
+    import {moonList, strToJD, R2D, toGlobe, locToStr, filterObj} from '@/libs/horison';
     import base from 'astronomia/src/base';
     import julian from 'astronomia/src/julian';
 
@@ -87,8 +101,8 @@
         {key: 'az', label: 'Azimut(selatan °)', value: true, c: '    Az(°)   '},
         {key: 'range', label: 'Jarak(KM)', value: true, c: ' Jarak(KM)  '},
         {key: 'sd', label: 'Semi Diameter(\')', value: true, c: '     SD(\')     '},
-        {key: 'phase', label: 'Fase °', value: true, c: '  Fase(°)  '},
-        //{key: 'fraction', label: 'Fraksi iluminasi %', value: true, c: '  Fraksi(%) '},
+        //{key: 'phase', label: 'Fase °', value: true, c: '  Fase(°)  '},
+        {key: 'fraction', label: 'Fraksi iluminasi %', value: true, c: '  Fraksi(%) '},
         {key: 'elongation', label: 'Elongasi(°)', value: true, c: 'Elongasi(°) '},
         {key: 'deltaT', label: 'Delta T(detik)', value: true, c: '   deltaT   '},
         {key: 'gst', label: 'GST(°)', value: true, c: '   GST(°)   '},
@@ -101,10 +115,15 @@
         },
         data() {
             return {
-                from: '',
-                to: '',
-                unit: 'h',
-                interval: 1,
+                model: {
+                    lat: '',
+                    lon: '',
+                    from: '',
+                    to: '',
+                    unit: 'h',
+                    interval: 1,
+                },
+                loc: {},
                 units: units,
                 columns,
                 rows: []
@@ -112,36 +131,36 @@
         },
         watch: {
             '$route.query': function (v) {
-                this.setParams(v);
+                this.setModel(v);
                 this.calcList();
             }
         },
         mounted() {
-            this.setParams(this.$route.query);
+            this.setModel(this.$route.query);
             this.calcList();
         },
         methods: {
             submit() {
-                const query = Object.assign({}, this.$route.query);
-                query.from = this.from;
-                query.to = this.to;
-                query.interval = this.interval;
-                query.unit = this.unit;
+                const query = filterObj(Object.assign({}, this.$route.query, this.model));
                 this.$router.push({query});
             },
-            setParams(v) {
-                this.from = v.from ? v.from : moment().format('YYYY-MM-DD [00:00:00]');
-                this.to = v.to ? v.to : moment().format('YYYY-MM-DD [23:59:59]');
-                this.unit = v.unit ? v.unit : 'h';
-                this.interval = v.interval ? v.interval : 1;
+            setModel(v) {
+                Object.assign(this.model, {
+                    lat: this.$store.state.location.lat,
+                    lon: this.$store.state.location.lon,
+                    from: moment().format('YYYY-MM-DD [00:00:00]'),
+                    to: moment().format('YYYY-MM-DD [23:59:59]'),
+                    unit: 'h',
+                    interval: 1,
+                }, filterObj(v));
             },
             calcList() {
-                let jd1 = strToJD(this.from);
-                let jd2 = strToJD(this.to);
+                this.loc = {lat: this.model.lat, lon: this.model.lon};
+                let jd1 = strToJD(this.model.from || moment().format('YYYY-MM-DD [00:00:00]'));
+                let jd2 = strToJD(this.model.to || moment().format('YYYY-MM-DD [23:59:59.999]'));
                 if (jd1 && jd2) {
-                    let step = this.interval * units[this.unit].value / (24 * 3600);
-                    let g = toGlobe(this.$store.state.location);
-                    this.rows = moonList(jd1, jd2, step, g).map(v => {
+                    let step = this.model.interval * units[this.model.unit].value / (24 * 3600);
+                    this.rows = moonList(jd1, jd2, step, toGlobe(this.loc)).map(v => {
                         v.date = julian.JDToDate(v.jd);
                         v.lon *= R2D;
                         v.lat *= R2D;
@@ -184,8 +203,7 @@
                     }
                 }
                 l = l.join(' ');
-
-                l += '\n' + '*'.padStart(l.length, '*') + '\n';
+                l = `(${locToStr(this.loc)})\n\n${l}\n${'*'.padStart(l.length, '*')}\n`;
                 if (this.rows.length) {
                     return l + this.rows.map(row => {
                         let r = [
@@ -227,4 +245,3 @@
         }
     }
 </script>
-

@@ -219,18 +219,21 @@ export function deltaTJD(jd) {
 }
 
 export function strToJD(str) {
-    if (!str)
-        return false
-    str = str.trim()
-    let m = str.match(/^JD\s+([\d\.]+)/i)
-    if (m && m[1]) {
-        return parseFloat(m[1])
+    if (!str){
+        return false;
     }
-    if (!str.match(/Z(\+|-)?\d*$/))
-        str += 'Z'
+    str = str.trim();
+    let m = str.match(/^JD\s+([\d\.]+)/i);
+    if (m && m[1]) {
+        return parseFloat(m[1]);
+    }
+    if(str.match(/^\d{4}-\d{2}-\d{2}$/)){
+        str += ' 00:00:00Z';
+    }else if (!str.match(/Z(\+|-)?\d*$/)){
+        str += 'Z';
+    }
     try {
-        let date = new Date(str)
-        return julian.DateToJD(date)
+        return julian.DateToJD(new Date(str))
     } catch (e) {
         return false
     }
@@ -305,6 +308,14 @@ export function toGlobe(c) {
         ...c,
         lon: -c.lon * D2R,
         lat: c.lat * D2R,
+    }
+}
+
+export function locToStr(c, isRad){
+    if(isRad){
+        return `${abs(c.lat)*R2D} ${c.lat > 0 ?'N':'S'}, ${abs(c.lon)*R2D} ${c.lon > 0 ?'W':'E'}`;
+    }else{
+        return `${abs(c.lat)} ${c.lat > 0 ?'N':'S'}, ${abs(c.lon)} ${c.lon < 0 ?'W':'E'}`;
     }
 }
 
@@ -1124,6 +1135,7 @@ export default {
     JDToDate,
     strToJD,
     toGlobe,
+    locToStr,
     sunPosition,
     moonPosition,
     sunList,
