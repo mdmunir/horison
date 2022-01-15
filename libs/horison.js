@@ -172,6 +172,7 @@ export function now() {
         s: date.getSeconds() + date.getMilliseconds() / 1000,
     }
 }
+
 /**
  * 
  * @param {Number} jde 
@@ -317,6 +318,20 @@ export function locToStr(c, isRad){
     }else{
         return `${abs(c.lat)} ${c.lat > 0 ?'N':'S'}, ${abs(c.lon)} ${c.lon < 0 ?'W':'E'}`;
     }
+}
+
+export function formatAngle(format,value, fixed, length){
+    let result = '';
+    switch (format) {
+        case 'dms':
+            result = new sexa.Angle(value * D2R).toString(1);
+            break;
+            
+        default:
+            result = value.toFixed(fixed===undefined ? 5 : (fixed||0));
+            break;
+    }
+    return length ? result.padStart(length, ' ') : result;
 }
 
 /**

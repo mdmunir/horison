@@ -65,6 +65,19 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group row">
+                                    <label for="sudut" class="col-sm-4 col-form-label">Format Sudut</label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" id="latitude" v-model="format.sudut">
+                                            <option value="decimal">Desimal</option>
+                                            <option value="dms">Dms</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </form>
@@ -81,7 +94,7 @@
 </template>
 
 <script>
-    import {moonList, strToJD, R2D, toGlobe, locToStr, filterObj} from '@/libs/horison';
+    import {moonList, strToJD, R2D, toGlobe, locToStr, filterObj, formatAngle} from '@/libs/horison';
     import base from 'astronomia/src/base';
     import julian from 'astronomia/src/julian';
 
@@ -93,20 +106,20 @@
     }
     const columns = [
         {key: 'jd', label: 'Julian Day', value: true, c: '   Julian Day    '},
-        {key: 'lon', label: 'Longitude(°)', value: true, c: '   Lon(°)   '},
-        {key: 'lat', label: 'Latitude(°)', value: true, c: '   Lat(°)   '},
-        {key: 'ra', label: 'RA(°)', value: true, c: '   RA(°)    '},
-        {key: 'dec', label: 'Dec(°)', value: true, c: '   Dec(°)   '},
-        {key: 'alt', label: 'Altitude(+ref °)', value: true, c: '   Alt(°)   '},
-        {key: 'az', label: 'Azimut(selatan °)', value: true, c: '    Az(°)   '},
+        {key: 'lon', label: 'Longitude(°)', value: true, c: '    Lon(°)    '},
+        {key: 'lat', label: 'Latitude(°)', value: true, c: '    Lat(°)    '},
+        {key: 'ra', label: 'RA(°)', value: true, c: '    RA(°)     '},
+        {key: 'dec', label: 'Dec(°)', value: true, c: '    Dec(°)    '},
+        {key: 'alt', label: 'Altitude(+ref °)', value: true, c: '    Alt(°)    '},
+        {key: 'az', label: 'Azimut(selatan °)', value: true, c: '     Az(°)    '},
         {key: 'range', label: 'Jarak(KM)', value: true, c: ' Jarak(KM)  '},
-        {key: 'sd', label: 'Semi Diameter(\')', value: true, c: '     SD(\')     '},
+        {key: 'sd', label: 'Semi Diameter(\')', value: true, c: '      SD(\')     '},
         //{key: 'phase', label: 'Fase °', value: true, c: '  Fase(°)  '},
-        {key: 'fraction', label: 'Fraksi iluminasi %', value: true, c: '  Fraksi(%) '},
-        {key: 'elongation', label: 'Elongasi(°)', value: true, c: 'Elongasi(°) '},
-        {key: 'deltaT', label: 'Delta T(detik)', value: true, c: '   deltaT   '},
-        {key: 'gst', label: 'GST(°)', value: true, c: '   GST(°)   '},
-        {key: 'obliquity', label: 'Obliquity ε(°)', value: true, c: '    ε(°)    '},
+        {key: 'fraction', label: 'Fraksi iluminasi %', value: true, c: '   Fraksi(%)  '},
+        {key: 'elongation', label: 'Elongasi(°)', value: true, c: ' Elongasi(°)  '},
+        {key: 'deltaT', label: 'Delta T(detik)', value: true, c: '    deltaT    '},
+        {key: 'gst', label: 'GST(°)', value: true, c: '    GST(°)   '},
+        {key: 'ε', label: 'Obliquity ε(°)', value: true, c: '      ε(°)    '},
     ];
 
     export default {
@@ -122,6 +135,9 @@
                     to: '',
                     unit: 'h',
                     interval: 1,
+                },
+                format:{
+                    sudut:'decimal',
                 },
                 loc: {},
                 units: units,
@@ -170,9 +186,9 @@
                         v.az *= R2D;
                         v.ε *= R2D;
                         v.phase *= R2D;
+                        v.phase = base.pmod(v.phase, 360);
                         v.elongation *= R2D;
                         v.az = base.pmod(v.az, 360);
-                        v.phase = base.pmod(v.phase, 360);
                         v.fraction *= 100;
                         v.sd *= R2D * 3600000;
                         return v;
@@ -214,19 +230,19 @@
                             if (col.value) {
                                 switch (col.key) {
                                     case 'jd':
-                                        r.push(row.jd.toFixed(6).padStart(15, ' '));
+                                        r.push(formatAngle('decimal', row.jd, 6, 15));
+                                        break;
+                                    case 'deltaT':
+                                        r.push(formatAngle('decimal', row.deltaT, 5, 15));
                                         break;
                                     case 'range':
-                                        r.push(row.range.toFixed(1).padStart(14, ' '));
-                                        break;
-                                    case 'obliquity':
-                                        r.push(row.ε.toFixed(5).padStart(12, ' '));
+                                        r.push(formatAngle('decimal', row.range, 1, 14));
                                         break;
                                     case 'sd':
-                                        r.push(moment(row.sd).format('   mm[\']ss.SSS["]'));
+                                        r.push(moment(row.sd).format('    mm[\']ss.SSS["]'));
                                         break;
                                     default:
-                                        r.push(row[col.key].toFixed(5).padStart(12, ' '));
+                                        r.push(formatAngle(this.format.sudut, row[col.key], 5, 14));
                                         break;
                                 }
                             }
