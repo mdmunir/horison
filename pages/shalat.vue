@@ -1,52 +1,13 @@
 <template>
-    <lte-content title="Posisi Matahari">
-        <lte-card buttons="collapse">
-            <form class="form-horizontal">
-                <div class="row">
-                    <div class="col-lg-4 col-sm-12">
-                        <div class="form-group row">
-                            <label for="latitude" class="col-sm-4 col-form-label">Latitude</label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control" id="latitude" v-model="model.lat"
-                                       placeholder="Latitude">
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <label for="longitude" class="col-sm-4 col-form-label">Longitude</label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control" id="longitude" v-model="model.lon"
-                                       placeholder="Longitude">
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <label for="height" class="col-sm-4 col-form-label">Height</label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control" id="height" v-model="model.height"
-                                       placeholder="Height">
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <div class="offset-sm-4 col-sm-8">
-                                <button class="btn btn-sm btn-primary" @click="submit()">Generate</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-8 col-sm-12">
-                        <div class="row">
-                            <div class="col-lg-4" v-for="cols in columnsChunk">
-                                <div class="form-check" v-for="col in cols">
-                                    <input type="checkbox" class="form-check-input" :id="'ck_'+col.key"  v-model="col.value">
-                                    <label class="form-check-label" :for="'ck_'+col.key">{{col.label}}</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </lte-card>
-        <lte-card title="Result">
+    <lte-content title="Waktu Shalat">        
+        <lte-card>
             <template #tools>
-                <a v-if="rows.length" class="btn btn-tool" :href="contentDownload" download="posisi-matahari.txt">
+                <ul class="pagination pagination-sm float-left">
+                    <li class="page-item" v-for="link in links">
+                    <nuxt-link class="page-link" :to="link.to">{{link.label}}</nuxt-link>
+                    </li>
+                </ul>
+                <a v-if="rows.length" class="btn btn-tool" :href="contentDownload" download="waktu-shalat.txt">
                     <i class="fas fa-save"></i>
                 </a>
             </template>
@@ -56,153 +17,138 @@
 </template>
 
 <script>
-    import {sunList, strToJD, R2D, toGlobe, locToStr, filterObj} from '@/libs/horison';
+    import {locToStr, now} from '@/libs/horison';
+
+    import calcPrayer from '@/libs/prayer';
     import base from 'astronomia/src/base';
     import julian from 'astronomia/src/julian';
 
-    const units = {
-        s: {label: 'Detik', value: 1},
-        m: {label: 'Menit', value: 60},
-        h: {label: 'Jam', value: 3600},
-        d: {label: 'Hari', value: 24 * 3600},
-    }
+    const CHUNK = 2;
+
     const columns = [
-        {key: 'jd', label: 'Julian Day', value: true, c: '   Julian Day    '},
-        {key: 'lon', label: 'Longitude(°)', value: true, c: '   Lon(°)   '},
-        {key: 'lat', label: 'Latitude(")', value: true, c: '   Lat(")   '},
-        {key: 'ra', label: 'RA(°)', value: true, c: '   RA(°)    '},
-        {key: 'dec', label: 'Dec(°)', value: true, c: '   Dec(°)   '},
-        {key: 'alt', label: 'Altitude(+ref °)', value: true, c: '   Alt(°)   '},
-        {key: 'az', label: 'Azimut(selatan °)', value: true, c: '    Az(°)   '},
-        {key: 'range', label: 'Jarak(KM)', value: true, c: ' Jarak(KM)  '},
-        {key: 'sd', label: 'Semi Diameter(\')', value: true, c: '     SD(\')     '},
-        {key: 'deltaT', label: 'Delta T(detik)', value: true, c: '   deltaT   '},
-        {key: 'gst', label: 'GST(°)', value: true, c: '   GST(°)   '},
-        {key: 'obliquity', label: 'Obliquity ε(°)', value: true, c: '    ε(°)    '},
+        {key: 'subuh', label: 'Subuh', value: true, },
+        {key: 'terbit', label: 'Terbit', value: true, },
+        {key: 'dzuhur', label: 'Dzuhur', value: true, },
+        {key: 'ashar', label: 'Ashar', value: true, },
+        {key: 'maghrib', label: 'Maghrib', value: true, },
+        {key: 'isya', label: 'Isya', value: true, },
+        {key: 'tengah', label: 'Tengah Malam', value: true, },
+        {key: 'pertiga', label: 'Pertiga Akhir', value: true, },
     ];
+
+    const LABELS = {
+        subuh: 'Subuh',
+        terbit: 'Terbit',
+        dzuhur: 'Dzuhur',
+        ashar: 'Ashar',
+        maghrib: 'Maghrib',
+        isya: 'Isya',
+        tengah: 'Tengah Malam',
+        pertiga: 'Pertiga Akhir',
+    }
+
+    function padStr(v, l) {
+        let n = (l + v.length) / 2;
+        let r = v.padStart(n, ' ');
+        return r.padEnd(l, ' ');
+    }
 
     export default {
         head: {
-            title: 'Posisi Matahari',
+            title: 'Waktu Shalat',
         },
         data() {
+            const {y, m} = now();
             return {
                 model: {
-                    lat: '',
-                    lon: '',
-                    from: '',
-                    to: '',
-                    unit: 'h',
-                    interval: 1,
+                    m: m,
+                    y: y,
                 },
-                loc: {},
-                units: units,
-                columns,
+                columns: columns,
                 rows: []
             }
         },
         watch: {
             '$route.query': function (v) {
-                this.setModel(v);
+                this.setData(v);
                 this.calcList();
             }
         },
         mounted() {
-            this.setModel(this.$route.query);
+            this.setData(this.$route.query);
             this.calcList();
         },
         methods: {
-            submit() {
-                const query = filterObj(Object.assign({}, this.$route.query, this.model));
-                this.$router.push({query});
-            },
-            setModel(v) {
-                Object.assign(this.model, {
-                    lat: this.$store.state.location.lat,
-                    lon: this.$store.state.location.lon,
-                    from: moment().format('YYYY-MM-DD [00:00:00]'),
-                    to: moment().format('YYYY-MM-DD [23:59:59]'),
-                    unit: 'h',
-                    interval: 1,
-                }, filterObj(v));
+            setData(v) {
+                const {y, m} = now();
+                this.model.y = (v.y || y) * 1;
+                this.model.m = (v.m || m) * 1;
+                if(this.model.m < 1){
+                    this.model.m = 1;
+                }
+                if(this.model.m > 12){
+                    this.model.m = 12;
+                }
             },
             calcList() {
-                this.loc = {lat: this.model.lat, lon: this.model.lon};
-                let jd1 = strToJD(this.model.from || moment().format('YYYY-MM-DD [00:00:00]'));
-                let jd2 = strToJD(this.model.to || moment().format('YYYY-MM-DD [23:59:59.999]'));
-                console.log(this.loc, jd1, jd2);
-                if (jd1 && jd2) {
-                    let step = this.model.interval * units[this.model.unit].value / (24 * 3600);
-                    this.rows = sunList(jd1, jd2, step, toGlobe(this.loc)).map(v => {
-                        v.date = julian.JDToDate(v.jd);
-                        v.lon *= R2D;
-                        v.lat *= R2D * 3600;
-                        v.ra *= R2D;
-                        v.dec *= R2D;
-                        v.alt *= R2D;
-                        v.az *= R2D;
-                        v.ε *= R2D;
-                        v.az = base.pmod(v.az, 360);
-                        v.sd *= R2D * 3600000;
-                        return v;
-                    });
-                } else {
-                    this.rows = [];
+                const {y, m} = this.model;
+                const last = (new Date(y, m, 0)).getDate();
+                const result = [];
+                const loc = this.$store.state.location;
+                const config = this.$store.state.prayer;
+                for (let d = 1; d <= last; d++) {
+                    let times = calcPrayer(y, m, d, loc, config);
+                    result.push({day: d, times});
                 }
+                this.rows = result;
             },
         },
         computed: {
-            columnsChunk() {
-                let n = Math.ceil(columns.length / 3);
-                let r = [];
-                for (var i = 0; i < 3; i++) {
-                    r.push(this.columns.slice(i * n, i * n + n));
-                }
-                return r;
+            links() {
+                let {y, m} = this.model;
+                return [
+                    {to: {query: {y: y - 1, m: m}}, label: '«'},
+                    {to: {query: {y: (m <= 1 ? y - 1 : y), m: (m <= 1 ? 12 : m - 1)}}, label: '<'},
+                    {to: {query: {y, m}}, label: moment(new Date(y, m - 1, 1)).format('MMMM YYYY')},
+                    {to: {query: {y: (m >= 12 ? y + 1 : y), m: (m >= 12 ? 1 : m + 1)}}, label: '>'},
+                    {to: {query: {y: y + 1, m: m}}, label: '»'},
+                ];
             },
             rowsStr() {
+                if (!this.rows.length) {
+                    return '';
+                }
+                const loc = this.$store.state.location;
+                const {y, m} = this.model;
                 let l = [
-                    `(${locToStr(this.loc)})\n\n`,
-                    '      Time(UT)      ',
+                    ' Tanggal ',
                 ];
 
-                for (var i in this.columns) {
-                    var col = this.columns[i];
-                    if (col.value) {
-                        l.push(col.c);
+                this.rows[0].times.forEach(time => {
+                    if (LABELS[time.name]) {
+                        l.push(padStr(LABELS[time.name], 15));
                     }
-                }
-                let len = l[1].length;
-                l = l.join(' ');
+                });
 
-                l += '\n' + '*'.padStart(len, '*') + '\n';
+                l = l.join(' ');
+                let garis = '*'.padStart(l.length, '*');
+                l = `Data         : Waktu Shalat
+Lokasi       : ${locToStr(loc)}
+Bulan        : ${moment(new Date(y, m - 1, 1)).format('MMMM YYYY')}
+${garis}
+${l}
+${garis}\n`;
                 if (this.rows.length) {
                     return l + this.rows.map(row => {
                         let r = [
-                            moment(row.date).utc().format('YYYY-MM-DD HH:mm:ss'),
+                            `${row.day}  `.padStart(9, ' '),
                         ];
-                        for (var i in this.columns) {
-                            var col = this.columns[i];
-                            if (col.value) {
-                                switch (col.key) {
-                                    case 'jd':
-                                        r.push(row.jd.toFixed(6).padStart(15, ' '));
-                                        break;
-                                    case 'range':
-                                        r.push(row.range.toFixed(1).padStart(14, ' '));
-                                        break;
-                                    case 'obliquity':
-                                        r.push(row.ε.toFixed(5).padStart(12, ' '));
-                                        break;
-                                    case 'sd':
-                                        r.push(moment(row.sd).format('   mm[\']ss.SSS["]'));
-                                        break;
-                                    default:
-                                        r.push(row[col.key].toFixed(5).padStart(12, ' '));
-                                        break;
-                                }
+                        row.times.forEach(time => {
+                            if (LABELS[time.name]) {
+                                r.push(moment(time.time).utcOffset(loc.timezone)
+                                    .format('HH:mm   ').padStart(15, ' '));
                             }
-                        }
+                        });
 
                         return r.join(' ');
                     }).join('\n');

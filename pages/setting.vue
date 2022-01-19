@@ -8,14 +8,14 @@
                             <label for="latitude" class="col-sm-4 col-form-label">Latitude</label>
                             <div class="col-sm-8">
                                 <input type="number" class="form-control" id="latitude"
-                                       placeholder="Latitude" v-model="location.lat">
+                                       placeholder="Latitude" v-model.number="location.lat">
                             </div>
                         </div>
                         <div class="form-group row">
                             <label for="longitude" class="col-sm-4 col-form-label">Longitude</label>
                             <div class="col-sm-8">
                                 <input type="number" class="form-control" id="longitude"
-                                       placeholder="Longitude" v-model="location.lon">
+                                       placeholder="Longitude" v-model.number="location.lon">
                             </div>
                         </div>
                     </div>
@@ -24,19 +24,22 @@
                             <label for="timezone" class="col-sm-4 col-form-label">Timezone</label>
                             <div class="col-sm-8">
                                 <input type="number" class="form-control" id="timezone"
-                                       placeholder="Timezone" v-model="location.timezone">
+                                       placeholder="Timezone" v-model.number="location.timezone">
                             </div>
                         </div>
                         <div class="form-group row">
                             <label for="height" class="col-sm-4 col-form-label">Ketinggian</label>
                             <div class="col-sm-8">
                                 <input type="number" class="form-control" id="height"
-                                       placeholder="Ketinggian" v-model="location.height">
+                                       placeholder="Ketinggian" v-model.number="location.height">
                             </div>
                         </div>
                     </div>
                 </div>
             </form>
+            <template #footer>
+                <button type="button" class="btn btn-primary" @click='saveLoc'>Simpan</button>
+            </template>
         </lte-card>
 
         <lte-card title="Waktu Shalat" buttons="collapse">
@@ -48,35 +51,42 @@
                             <label for="subuh" class="col-sm-4 col-form-label">Subuh</label>
                             <div class="col-sm-8">
                                 <input type="number" class="form-control" id="subuh"
-                                       placeholder="Koreksi subuh" v-model="prayer.subuh">
+                                       placeholder="Koreksi subuh" v-model.number="prayer.subuh">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="terbit" class="col-sm-4 col-form-label">Terbit</label>
+                            <div class="col-sm-8">
+                                <input type="number" class="form-control" id="terbit"
+                                       placeholder="Koreksi terbit" v-model.number="prayer.terbit">
                             </div>
                         </div>
                         <div class="form-group row">
                             <label for="dzuhur" class="col-sm-4 col-form-label">Dzuhur</label>
                             <div class="col-sm-8">
                                 <input type="number" class="form-control" id="dzuhur"
-                                       placeholder="Koreksi dzuhur" v-model="prayer.dzuhur">
+                                       placeholder="Koreksi dzuhur" v-model.number="prayer.dzuhur">
                             </div>
                         </div>
                         <div class="form-group row">
                             <label for="ashar" class="col-sm-4 col-form-label">Ashar</label>
                             <div class="col-sm-8">
                                 <input type="number" class="form-control" id="ashar"
-                                       placeholder="Koreksi ashar" v-model="prayer.ashar">
+                                       placeholder="Koreksi ashar" v-model.number="prayer.ashar">
                             </div>
                         </div>
                         <div class="form-group row">
                             <label for="maghrib" class="col-sm-4 col-form-label">Maghrib</label>
                             <div class="col-sm-8">
                                 <input type="number" class="form-control" id="maghrib"
-                                       placeholder="Koreksi maghrib" v-model="prayer.maghrib">
+                                       placeholder="Koreksi maghrib" v-model.number="prayer.maghrib">
                             </div>
                         </div>
                         <div class="form-group row">
                             <label for="isya" class="col-sm-4 col-form-label">Isya</label>
                             <div class="col-sm-8">
                                 <input type="number" class="form-control" id="isya"
-                                       placeholder="Koreksi isya" v-model="prayer.isya">
+                                       placeholder="Koreksi isya" v-model.number="prayer.isya">
                             </div>
                         </div>
                     </div>
@@ -86,27 +96,22 @@
                             <label for="alt_subuh" class="col-sm-4 col-form-label">Altitude Subuh</label>
                             <div class="col-sm-8">
                                 <input type="number" class="form-control" id="alt_subuh"
-                                       placeholder="Altitude subuh" v-model="prayer.alt_subuh">
+                                       placeholder="Altitude subuh" v-model.number="prayer.alt_subuh">
                             </div>
                         </div>
                         <div class="form-group row">
                             <label for="alt_isya" class="col-sm-4 col-form-label">Altitude isya</label>
                             <div class="col-sm-8">
                                 <input type="number" class="form-control" id="alt_isya"
-                                       placeholder="Altitude isya" v-model="prayer.alt_isya">
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <div class="offset-sm-4 col-sm-8">
-                                <div class="form-check">
-                                    <input type="checkbox" class="form-check-input" id="koreksi_height" v-model="prayer.height">
-                                    <label class="form-check-label" for="koreksi_height">Koreksi ketinggian</label>
-                                </div>
+                                       placeholder="Altitude isya" v-model.number="prayer.alt_isya">
                             </div>
                         </div>
                     </div>
                 </div>
             </form>
+            <template #footer>
+                <button type="button" class="btn btn-primary" @click='savePrayer'>Simpan</button>
+            </template>
         </lte-card>
     </lte-content>
 </template>
@@ -123,18 +128,12 @@
                 prayer: Object.assign({}, this.$store.state.prayer),
             }
         },
-        watch: {
-            location: {
-                deep: true,
-                handler(value) {
-                    this.$store.commit('location/change', value);
-                }
+        methods:{
+            saveLoc(){
+                this.$store.commit('location/change', this.location);
             },
-            prayer: {
-                deep: true,
-                handler(value) {
-                    this.$store.commit('prayer/change', value);
-                }
+            savePrayer(){
+                this.$store.commit('prayer/change', this.prayer);
             },
         },
     }

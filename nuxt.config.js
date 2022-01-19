@@ -12,7 +12,8 @@ const precache = [
     {url: `${DEPLOY_PATH}plugins/jquery-ui/jquery-ui.min.js`},
     {url: `${DEPLOY_PATH}plugins/bootstrap/js/bootstrap.bundle.min.js`},
     {url: `${DEPLOY_PATH}plugins/moment/moment.min.js`},
-    {url: `${DEPLOY_PATH}plugins/daterangepicker/daterangepicker.js`},
+    //{url: `${DEPLOY_PATH}plugins/inputmask/jquery.inputmask.min.js`},
+    //{url: `${DEPLOY_PATH}plugins/daterangepicker/daterangepicker.js`},
     {url: `${DEPLOY_PATH}dist/js/adminlte.js`},
 ];
 
@@ -55,7 +56,8 @@ export default {
 //      { src: `${DEPLOY_PATH}plugins/jqvmap/maps/jquery.vmap.usa.js`, body: true },
 //      { src: `${DEPLOY_PATH}plugins/jquery-knob/jquery.knob.min.js`, body: true },
             {src: `${DEPLOY_PATH}plugins/moment/moment.min.js`, body: true},
-            {src: `${DEPLOY_PATH}plugins/daterangepicker/daterangepicker.js`, body: true},
+//            {src: `${DEPLOY_PATH}plugins/inputmask/jquery.inputmask.min.js`, body: true},            
+//      {src: `${DEPLOY_PATH}plugins/daterangepicker/daterangepicker.js`, body: true},
 //      { src: `${DEPLOY_PATH}plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js`, body: true },
 //      { src: `${DEPLOY_PATH}plugins/summernote/summernote-bs4.min.js`, body: true },
 //      { src: `${DEPLOY_PATH}plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js`, body: true },

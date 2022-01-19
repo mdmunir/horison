@@ -21,11 +21,8 @@ import sidereal from 'astronomia/src/sidereal'
 import planetposition from 'astronomia/src/planetposition'
 import elp from 'astronomia/src/elp'
 
-import vsop87Bearth from 'astronomia/data/vsop87Bearth'
-import elpMppDe from 'astronomia/data/elpMppDe'
-
-export const earth = new planetposition.Planet(vsop87Bearth)
-export const elpMoon = new elp.Moon(elpMppDe)
+import earth from './earth'
+import elpMoon from './moon'
 
 const {cos, sin, tan, atan, asin, abs, floor, PI} = Math
 
@@ -220,7 +217,7 @@ export function deltaTJD(jd) {
 }
 
 export function strToJD(str) {
-    if (!str){
+    if (!str) {
         return false;
     }
     str = str.trim();
@@ -228,9 +225,9 @@ export function strToJD(str) {
     if (m && m[1]) {
         return parseFloat(m[1]);
     }
-    if(str.match(/^\d{4}-\d{2}-\d{2}$/)){
+    if (str.match(/^\d{4}-\d{2}-\d{2}$/)) {
         str += ' 00:00:00Z';
-    }else if (!str.match(/Z(\+|-)?\d*$/)){
+    } else if (!str.match(/Z(\+|-)?\d*$/)) {
         str += 'Z';
     }
     try {
@@ -312,23 +309,27 @@ export function toGlobe(c) {
     }
 }
 
-export function locToStr(c, isRad){
-    if(isRad){
-        return `${abs(c.lat)*R2D} ${c.lat > 0 ?'N':'S'}, ${abs(c.lon)*R2D} ${c.lon > 0 ?'W':'E'}`;
-    }else{
-        return `${abs(c.lat)} ${c.lat > 0 ?'N':'S'}, ${abs(c.lon)} ${c.lon < 0 ?'W':'E'}`;
+export function locToStr(c, isRad) {
+    if (isRad) {
+        return `${abs(c.lat) * R2D} ${c.lat > 0 ? 'N' : 'S'}, ${abs(c.lon) * R2D} ${c.lon > 0 ? 'W' : 'E'}`;
+    } else {
+        return `${abs(c.lat)} ${c.lat > 0 ? 'N' : 'S'}, ${abs(c.lon)} ${c.lon < 0 ? 'W' : 'E'}`;
     }
 }
 
-export function formatAngle(format,value, fixed, length){
+export function formatAngle(format, value, fixed, length) {
     let result = '';
     switch (format) {
         case 'dms':
-            result = new sexa.Angle(value * D2R).toString(1);
+            let neg = value < 0;
+            value = abs(value);
+            result = `${neg ? '-' : ''}${floor(value)}°`;
+            value = (value - floor(value)) * 3600000;
+            result += moment(value).format('mm[\']ss.S["]');
             break;
-            
+
         default:
-            result = value.toFixed(fixed===undefined ? 5 : (fixed||0));
+            result = value.toFixed(fixed === undefined ? 5 : (fixed || 0));
             break;
     }
     return length ? result.padStart(length, ' ') : result;
@@ -977,89 +978,6 @@ export class Hijriah {
     }
 }
 
-export class PrayerTime {
-    constructor(y, m, config) {
-        const NPOLY = 7;
-        let JD0 = this.T0 = dateToJD(y, m, 1);
-
-        this.sun = new ReducePosition((jde) => {
-            let {lon, lat, range} = solar.trueVSOP87(earth, jde)
-            lon += solar.aberration(range)
-            return {lon, lat, range}
-        }, JD0, -1, 33, NPOLY);
-
-        this.rise = new Rise((jd) => {
-            return this.sun.position(jd)
-        });
-        this.config = config;
-    }
-
-    /**
-     * 
-     * @param {Number} day 
-     * @param {Globe} g 
-     */
-    calc(day, g) {
-        if (day < 1 || day > 31) {
-            return;
-        }
-        let config = this.config || {}
-        let rise = this.rise
-        let timeOffset = calcTimeOffset(g.timezone)
-        let jd0 = this.T0 + floor(day - 1) - timeOffset / 24
-
-        const result = [];
-        let h0, t, maghrib, subuh;
-        // subuh
-        h0 = (config.alt_subuh || -20) * D2R
-        t = rise.calcH0(jd0, g, h0, -1)
-        result.push({name: 'subuh', label: 'Subuh', jd: t});
-        subuh = t;
-
-        // terbit
-        h0 = SUN_H0 + config.height ? elevationAngle(g.height) : 0;
-        t = rise.calcH0(jd0, g, h0, -1)
-        result.push({name: 'terbit', label: 'Terbit', jd: t})
-
-        // dzuhur
-        t = rise.calcHA(jd0, g, 0 * SUN_RADIUS)
-        result.push({name: 'dzuhur', label: 'Dzuhur', jd: t});
-
-        // ashar
-        let {dec} = this.sun.position(t)
-        h0 = atan(1 / (1 + abs(tan(dec - g.lat))))
-        t = rise.calcH0(jd0, g, h0, 1)
-        result.push({name: 'ashar', label: 'Ashar', jd: t});
-
-        // maghrib
-        h0 = SUN_H0 + config.height ? elevationAngle(g.height) : 0;
-        t = rise.calcH0(jd0, g, h0, 1)
-        result.push({name: 'maghrib', label: 'Maghrib', jd: t});
-        maghrib = t;
-
-        // isya
-        h0 = (config.alt_isya || -18) * D2R
-        t = rise.calcH0(jd0, g, h0, 1)
-        result.push({name: 'isya', label: 'Isya', jd: t});
-
-        // tengah malam
-        let selisih = base.pmod(subuh - maghrib, 1);
-        result.push({name: 'tengah', label: 'Pertengahan malam', jd: maghrib + selisih / 2});
-        result.push({name: 'pertiga', label: 'Pertiga malam akhir', jd: maghrib + selisih * 2 / 3});
-
-//        const kakbah = {dec: 21.4225 * D2R, ra: -39.8262 * D2R}
-//        const kiblah = angle.relativePosition(kakbah, {dec:g.lat, ra:g.lon})
-
-        return result.map(v => {
-            if (v.name != 'terbit' && config[v.name]) {
-                v.jd += config[v.name] / (24 * 60);
-            }
-            v.date = julian.JDToDate(v.jd);
-            return v;
-        });
-    }
-}
-
 export class HijriahAritmatic {
     constructor(kabisat, koreksi) {
         this.JD0 = 1948438 + (koreksi || 0)
@@ -1158,11 +1076,8 @@ export default {
     Hilal,
     Hijriah,
     HijriahAritmatic,
-    PrayerTime,
     Rise,
     ReducePosition,
-    earth,
-    elpMoon,
     NAMA_BULAN,
     D2R,
     R2D,
