@@ -119,7 +119,7 @@
                     return '';
                 }
                 const globe = Globe.fromLoc(this.$store.state.location);
-                const timezone = this.$store.state.location.offset;
+                const timezone = this.$store.state.location.offset || 420;
                 const {y, m} = this.model;
                 let l = [
                     ' Tanggal ',

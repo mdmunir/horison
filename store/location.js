@@ -1,13 +1,13 @@
 export const state = () => {
-    return JSON.parse(localStorage.getItem('horison/location')) || {
-        id:0,
+    return Object.assign({
+        id: 163,
         name: '',
-        lat: -6,
-        lon: 112,
+        lat: -6.170167,
+        lon: 106.831,
         timezone: 'Asia/Jakarta',
-        offset:420,
+        offset: 420,
         height: 10,
-    }
+    }, JSON.parse(localStorage.getItem('horison/location')) || {});
 }
 
 export const mutations = {

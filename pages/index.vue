@@ -34,7 +34,7 @@
                 const {y, m, d} = now();
                 const loc = this.$store.state.location;
                 const config = this.$store.state.prayer;
-                const zone = loc.offset;
+                const zone = loc.offset || 420;
                 let list = calcPrayer(y, m, d, loc, config);
                 return list.map(v => {
                     v.stime = moment(v.time).utcOffset(zone).format('HH:mm');
