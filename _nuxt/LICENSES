@@ -2,14 +2,6 @@
  * @copyright 2013 Sonia Keys
  * @copyright 2016 commenthol
  * @license MIT
- * @module extra
- */
-
-
-/**
- * @copyright 2013 Sonia Keys
- * @copyright 2016 commenthol
- * @license MIT
  * @module angle
  */
 
@@ -25,13 +17,6 @@
  * @copyright 2016 commenthol
  * @license MIT
  * @module coord
- */
-
-/**
- * @copyright 2013 Sonia Keys
- * @copyright 2016 commenthol
- * @license MIT
- * @module deltat
  */
 
 /**
@@ -59,21 +44,7 @@
  * @copyright 2013 Sonia Keys
  * @copyright 2016 commenthol
  * @license MIT
- * @module interpolation
- */
-
-/**
- * @copyright 2013 Sonia Keys
- * @copyright 2016 commenthol
- * @license MIT
  * @module iterate
- */
-
-/**
- * @copyright 2013 Sonia Keys
- * @copyright 2016 commenthol
- * @license MIT
- * @module julian
  */
 
 /**
@@ -136,13 +107,6 @@
  * @copyright 2013 Sonia Keys
  * @copyright 2016 commenthol
  * @license MIT
- * @module sexagesimal
- */
-
-/**
- * @copyright 2013 Sonia Keys
- * @copyright 2016 commenthol
- * @license MIT
  * @module sidereal
  */
 
@@ -168,6 +132,63 @@
  */
 
 
+/**
+ * @copyright 2013 Sonia Keys
+ * @copyright 2016 commenthol
+ * @license MIT
+ * @module moonposition
+ */
+
+
+/*!
+ * vue-client-only v0.0.0-semantic-release
+ * (c) 2021-present egoist <0x142857@gmail.com>
+ * Released under the MIT License.
+ */
+
+/*!
+ * vue-no-ssr v1.1.1
+ * (c) 2018-present egoist <0x142857@gmail.com>
+ * Released under the MIT License.
+ */
+
+/**
+ * @copyright 2013 Sonia Keys
+ * @copyright 2016 commenthol
+ * @license MIT
+ * @module deltat
+ */
+
+/**
+ * @copyright 2013 Sonia Keys
+ * @copyright 2016 commenthol
+ * @license MIT
+ * @module interpolation
+ */
+
+/**
+ * @copyright 2013 Sonia Keys
+ * @copyright 2016 commenthol
+ * @license MIT
+ * @module julian
+ */
+
+/**
+ * @copyright 2013 Sonia Keys
+ * @copyright 2016 commenthol
+ * @license MIT
+ * @module sexagesimal
+ */
+
+
+/**
+ * @copyright 2013 Sonia Keys
+ * @copyright 2016 commenthol
+ * @license MIT
+ * @module eqtime
+ */
+
+
 /*!
   * vue-router v3.5.3
   * (c) 2021 Evan You
@@ -184,17 +205,4 @@
  * vuex v3.6.2
  * (c) 2021 Evan You
  * @license MIT
- */
-
-
-/*!
- * vue-client-only v0.0.0-semantic-release
- * (c) 2021-present egoist <0x142857@gmail.com>
- * Released under the MIT License.
- */
-
-/*!
- * vue-no-ssr v1.1.1
- * (c) 2018-present egoist <0x142857@gmail.com>
- * Released under the MIT License.
  */
