@@ -92,10 +92,11 @@
 </template>
 
 <script>
-    import {sunList, strToJD, R2D, toGlobe, locToStr, filterObj, formatAngle} from '@/libs/horison';
+    import {R2D, Globe} from '@/libs/horison';
+    import {Solar} from '@/libs/position';
     import base from 'astronomia/src/base';
-    import julian from 'astronomia/src/julian';
 
+    const solar = new Solar();
     const CHUNK = 2;
     const units = {
         s: {label: 'Detik', value: 1},
@@ -106,23 +107,19 @@
     const columns = [
         {key: 'jd', label: 'Julian Day', value: true, c: 'Julian Day'},
         {key: 'lon', label: 'Longitude(°)', value: true, c: 'Lon(°)'},
-        {key: 'lat', label: 'Latitude(")', value: true, c: 'Lat(")'},
+        {key: 'lat', label: 'Latitude(°)', value: true, c: 'Lat(°)'},
         {key: 'ra', label: 'RA(°)', value: true, c: 'RA(°)'},
+        {key: 'gha', label: 'GHA(°)', value: true, c: 'GHA(°)'},
         {key: 'dec', label: 'Dec(°)', value: true, c: 'Dec(°)'},
-        {key: 'alt', label: 'Altitude(+ref °)', value: true, c: 'Alt(°)'},
+        {key: 'alt', label: 'Altitude(°)', value: true, c: 'Alt(°)'},
         {key: 'az', label: 'Azimut(selatan °)', value: true, c: 'Az(°)'},
         {key: 'range', label: 'Jarak(KM)', value: true, c: 'Jarak(KM)'},
-        {key: 'sd', label: 'Semi Diameter(\')', value: true, c: 'SD(\')'},
+        {key: 'hp', label: 'Horizontal Paralax(°)', value: true, c: 'HP(°)'},
+        {key: 'sd', label: 'Semi Diameter(°)', value: true, c: 'SD(°)'},
         {key: 'deltaT', label: 'Delta T(detik)', value: true, c: 'deltaT'},
         {key: 'gst', label: 'GST(°)', value: true, c: 'GST(°)'},
         {key: 'ε', label: 'Obliquity ε(°)', value: true, c: 'ε(°)'},
     ];
-
-    function padStr(v, l) {
-        let n = (l + v.length) / 2;
-        let r = v.padStart(n, ' ');
-        return r.padEnd(l, ' ');
-    }
 
     export default {
         head: {
@@ -141,10 +138,10 @@
                 format: {
                     sudut: 'decimal',
                 },
-                loc: {},
                 units: units,
                 columns,
-                rows: []
+                rows: [],
+                globe: null,
             }
         },
         watch: {
@@ -159,7 +156,7 @@
         },
         methods: {
             submit() {
-                const query = filterObj(Object.assign({}, this.$route.query, this.model));
+                const query = Object.assign({}, this.$route.query, this.model);
                 this.$router.push({query});
             },
             setModel(v) {
@@ -170,25 +167,27 @@
                     to: moment().format('YYYY-MM-DD [23:59:59]'),
                     unit: 'h',
                     interval: 1,
-                }, filterObj(v));
+                }, v);
             },
             calcList() {
-                this.loc = {lat: this.model.lat, lon: this.model.lon};
-                let jd1 = strToJD(this.model.from || moment().format('YYYY-MM-DD [00:00:00]'));
-                let jd2 = strToJD(this.model.to || moment().format('YYYY-MM-DD [23:59:59.999]'));
+                this.globe = Globe.fromLoc(this.model);
+                let jd1 = (this.model.from || moment().format('YYYY-MM-DD [00:00:00]')).toJD();
+                let jd2 = (this.model.to || moment().format('YYYY-MM-DD [23:59:59.99]')).toJD();
                 if (jd1 && jd2) {
                     let step = this.model.interval * units[this.model.unit].value / (24 * 3600);
-                    this.rows = sunList(jd1, jd2, step, toGlobe(this.loc)).map(v => {
-                        v.date = julian.JDToDate(v.jd);
+                    this.rows = solar.list(jd1, jd2, step, this.globe).map(v => {
+                        v.date = Date.fromJD(v.jd);
                         v.lon *= R2D;
-                        v.lat *= R2D * 3600;
+                        v.lat *= R2D;
                         v.ra *= R2D;
                         v.dec *= R2D;
                         v.alt *= R2D;
                         v.az *= R2D;
                         v.ε *= R2D;
                         v.az = base.pmod(v.az, 360);
-                        v.sd *= R2D * 3600000;
+                        v.sd *= R2D;
+                        v.hp *= R2D;
+                        v.gha *= R2D;
                         return v;
                     });
                 } else {
@@ -206,6 +205,7 @@
                 return r;
             },
             rowsStr() {
+                const isDms = (this.format.sudut == 'dms');
                 let l = [
                     '      Time(UT)       ',
                 ];
@@ -213,13 +213,13 @@
                 for (var i in this.columns) {
                     var col = this.columns[i];
                     if (col.value) {
-                        l.push(padStr(col.c, 15));
+                        l.push(col.c.padMidle(15));
                     }
                 }
                 l = l.join(' ');
                 let garis = '*'.padStart(l.length, '*');
                 l = `Data         : Posisi Matahari
-Lokasi       : ${locToStr(this.loc)}
+Lokasi       : ${this.globe}
 ${garis}
 ${l}
 ${garis}\n`;
@@ -231,26 +231,30 @@ ${garis}\n`;
                         for (var i in this.columns) {
                             var col = this.columns[i];
                             if (col.value) {
+                                let part = '';
+                                let value = row[col.key];
                                 switch (col.key) {
                                     case 'jd':
-                                        r.push(formatAngle('decimal', row.jd, 6, 15));
+                                        part = value.toFixed(6);
                                         break;
                                     case 'deltaT':
-                                        r.push(formatAngle('decimal', row.deltaT, 2, 15));
+                                        part = value.toFixed(2);
                                         break;
                                     case 'range':
-                                        r.push(formatAngle('decimal', row.range, 1, 15));
+                                        part = value.toFixed(1);
                                         break;
                                     case 'lat':
-                                        r.push(formatAngle('decimal', row.lat, 5, 15));
+                                    case 'hp':
+                                        part = (isDms ? value.dms(5, true) : value.toFixed(8));
                                         break;
                                     case 'sd':
-                                        r.push(moment(row.sd).format('mm[\']ss.SSS["] ').padStart(15, ' '));
+                                        part = (isDms ? value.dms(3, true) : value.toFixed(6));
                                         break;
                                     default:
-                                        r.push(formatAngle(this.format.sudut, row[col.key], 5, 15));
+                                        part = (isDms ? value.dms(2) : value.toFixed(5));
                                         break;
                                 }
+                                r.push(part.padStart(15, ' '));
                             }
                         }
 

@@ -1,23 +1,6 @@
 const DEPLOY_PATH = process.env.NODE_ENV === "development" ? '/' : (process.env.DEPLOY_PATH || '/horison/');
 
-const precache = [
-    {url: `${DEPLOY_PATH}plugins/fontawesome-free/css/all.min.css`},
-    {url: 'https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css'},
-    {url: `${DEPLOY_PATH}plugins/icheck-bootstrap/icheck-bootstrap.min.css`},
-    {url: `${DEPLOY_PATH}dist/css/adminlte.min.css`},
-    {url: `${DEPLOY_PATH}plugins/overlayScrollbars/css/OverlayScrollbars.min.css`},
-    {url: `${DEPLOY_PATH}plugins/daterangepicker/daterangepicker.css`},
-    {url: 'https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700'},
-    {url: `${DEPLOY_PATH}plugins/jquery/jquery.min.js`},
-    {url: `${DEPLOY_PATH}plugins/jquery-ui/jquery-ui.min.js`},
-    {url: `${DEPLOY_PATH}plugins/bootstrap/js/bootstrap.bundle.min.js`},
-    {url: `${DEPLOY_PATH}plugins/moment/moment.min.js`},
-    //{url: `${DEPLOY_PATH}plugins/inputmask/jquery.inputmask.min.js`},
-    //{url: `${DEPLOY_PATH}plugins/daterangepicker/daterangepicker.js`},
-    {url: `${DEPLOY_PATH}dist/js/adminlte.js`},
-];
-
-export default {
+const m = {
     // Disable server-side rendering: https://go.nuxtjs.dev/ssr-mode
     ssr: false,
 
@@ -37,30 +20,20 @@ export default {
             {rel: 'icon', type: 'image/x-icon', href: `${DEPLOY_PATH}favicon.ico`},
             {rel: 'stylesheet', href: `${DEPLOY_PATH}plugins/fontawesome-free/css/all.min.css`},
             {rel: 'stylesheet', href: 'https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css'},
-//      { rel: 'stylesheet', href: `${DEPLOY_PATH}plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css` },
             {rel: 'stylesheet', href: `${DEPLOY_PATH}plugins/icheck-bootstrap/icheck-bootstrap.min.css`},
-//      { rel: 'stylesheet', href: `${DEPLOY_PATH}plugins/jqvmap/jqvmap.min.css` },
+            {rel: 'stylesheet', href: `${DEPLOY_PATH}plugins/select2/css/select2.min.css`},
+            {rel: 'stylesheet', href: `${DEPLOY_PATH}plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css`},
             {rel: 'stylesheet', href: `${DEPLOY_PATH}dist/css/adminlte.min.css`},
             {rel: 'stylesheet', href: `${DEPLOY_PATH}plugins/overlayScrollbars/css/OverlayScrollbars.min.css`},
-            {rel: 'stylesheet', href: `${DEPLOY_PATH}plugins/daterangepicker/daterangepicker.css`},
-//      { rel: 'stylesheet', href: `${DEPLOY_PATH}plugins/summernote/summernote-bs4.css` },
+            //{rel: 'stylesheet', href: `${DEPLOY_PATH}plugins/daterangepicker/daterangepicker.css`},
             {rel: 'stylesheet', href: 'https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700'}
         ],
         script: [
             {src: `${DEPLOY_PATH}plugins/jquery/jquery.min.js`, body: true},
-            {src: `${DEPLOY_PATH}plugins/jquery-ui/jquery-ui.min.js`, body: true},
+            //{src: `${DEPLOY_PATH}plugins/jquery-ui/jquery-ui.min.js`, body: true},
             {src: `${DEPLOY_PATH}plugins/bootstrap/js/bootstrap.bundle.min.js`, body: true},
-//      { src: `${DEPLOY_PATH}plugins/chart.js/Chart.min.js`, body: true },
-//      { src: `${DEPLOY_PATH}plugins/sparklines/sparkline.js`, body: true },
-//      { src: `${DEPLOY_PATH}plugins/jqvmap/jquery.vmap.min.js`, body: true },
-//      { src: `${DEPLOY_PATH}plugins/jqvmap/maps/jquery.vmap.usa.js`, body: true },
-//      { src: `${DEPLOY_PATH}plugins/jquery-knob/jquery.knob.min.js`, body: true },
+            {src: `${DEPLOY_PATH}plugins/select2/js/select2.full.min.js`, body: true},
             {src: `${DEPLOY_PATH}plugins/moment/moment.min.js`, body: true},
-//            {src: `${DEPLOY_PATH}plugins/inputmask/jquery.inputmask.min.js`, body: true},            
-//      {src: `${DEPLOY_PATH}plugins/daterangepicker/daterangepicker.js`, body: true},
-//      { src: `${DEPLOY_PATH}plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js`, body: true },
-//      { src: `${DEPLOY_PATH}plugins/summernote/summernote-bs4.min.js`, body: true },
-//      { src: `${DEPLOY_PATH}plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js`, body: true },
             {src: `${DEPLOY_PATH}dist/js/adminlte.js`, body: true}
         ],
         bodyAttrs: {
@@ -74,6 +47,7 @@ export default {
 
     // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
     plugins: [
+        '~/libs/format.js'
     ],
 
     // Auto import components: https://go.nuxtjs.dev/config-components
@@ -108,9 +82,24 @@ export default {
             short_name: 'Horison',
             lang: 'en',
             display: 'standalone',
+            start_url: DEPLOY_PATH,
         },
         workbox: {
-            preCaching: precache,
+            importScripts: [`${DEPLOY_PATH}dist/precache.js`],
+            runtimeCaching: [
+                {
+                    urlPattern: 'https://fonts.googleapis.com/.*',
+                    handler: 'cacheFirst',
+                    method: 'GET',
+                    strategyOptions: {cacheableResponse: {statuses: [0, 200]}}
+                },
+                {
+                    urlPattern: 'https://fonts.gstatic.com/.*',
+                    handler: 'cacheFirst',
+                    method: 'GET',
+                    strategyOptions: {cacheableResponse: {statuses: [0, 200]}}
+                },
+            ]
         }
     },
 
@@ -125,3 +114,20 @@ export default {
         mode: 'hash',
     }
 }
+
+const precaches = [];
+const revision = null;
+
+m.head.link.forEach(link => {
+    if (link.rel == 'stylesheet') {
+        precaches.push({url: link.href, revision});
+    }
+});
+m.head.script.forEach(script => {
+    if (script.src) {
+        precaches.push({url: script.src, revision});
+    }
+});
+m.pwa.workbox.preCaching = precaches;
+
+export default m;

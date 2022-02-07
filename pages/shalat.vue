@@ -17,7 +17,7 @@
 </template>
 
 <script>
-    import {locToStr, now} from '@/libs/horison';
+    import {Globe, now} from '@/libs/horison';
 
     import calcPrayer from '@/libs/prayer';
     import base from 'astronomia/src/base';
@@ -118,7 +118,8 @@
                 if (!this.rows.length) {
                     return '';
                 }
-                const loc = this.$store.state.location;
+                const globe = Globe.fromLoc(this.$store.state.location);
+                const timezone = this.$store.state.location.offset;
                 const {y, m} = this.model;
                 let l = [
                     ' Tanggal ',
@@ -133,7 +134,7 @@
                 l = l.join(' ');
                 let garis = '*'.padStart(l.length, '*');
                 l = `Data         : Waktu Shalat
-Lokasi       : ${locToStr(loc)}
+Lokasi       : ${globe}
 Bulan        : ${moment(new Date(y, m - 1, 1)).format('MMMM YYYY')}
 ${garis}
 ${l}
@@ -145,7 +146,7 @@ ${garis}\n`;
                         ];
                         row.times.forEach(time => {
                             if (LABELS[time.name]) {
-                                r.push(moment(time.time).utcOffset(loc.timezone)
+                                r.push(moment(time.time).utcOffset(timezone)
                                     .format('HH:mm   ').padStart(15, ' '));
                             }
                         });

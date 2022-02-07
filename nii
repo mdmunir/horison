@@ -1,0 +1,45 @@
+#!/usr/bin/env node
+require('dotenv').config({ path: __dirname + '/.env' });
+const path = require('path');
+const fs = require('fs');
+const REGEX = /^--([\w-]+)(?:=(.*))?$/;
+const ENV_REGEX = /^ENV_([\w-]+)$/
+
+global.configs = {};
+
+function extract(args) {
+    let _args = [];
+    args.forEach(arg => {
+        let matchs = arg.match(REGEX);
+        let v = (typeof matchs[2] === 'undefined') ? true : matchs[2];
+        if (matchs) {
+            let env_matchs = matchs[1].match(ENV_REGEX);
+            if(env_matchs){
+                process.env[env_matchs[1]] = v;
+            }else{            
+                configs[matchs[1]] = v;
+                configs[id2camel(matchs[1])] = v;
+            }
+        } else {
+            _args.push(arg);
+        }
+    });
+    return _args;
+}
+
+function id2camel(str) {
+    let result = str.replace(/\b[a-z]/g, c => c.toUpperCase()).replace(/[^\w]/g, '');
+    return `${result[0].toLowerCase()}${result.slice(1)}`;
+}
+
+let _args = process.argv.slice(2), file = _args.shift(), func,
+f1 = path.join(__dirname, 'script', `${file}.js`), f2 = path.join(__dirname, 'script', `${file}-local.js`);
+if (fs.existsSync(f1)) {
+    func = require(f1);
+    return func.apply(null, extract(_args));
+} else if (fs.existsSync(f2)) {
+    func = require(f2);
+    return func.apply(null, extract(_args));
+}
+
+console.log(file, _args);

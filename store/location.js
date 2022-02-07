@@ -1,9 +1,11 @@
 export const state = () => {
     return JSON.parse(localStorage.getItem('horison/location')) || {
+        id:0,
         name: '',
         lat: -6,
         lon: 112,
-        timezone: 7,
+        timezone: 'Asia/Jakarta',
+        offset:420,
         height: 10,
     }
 }
