@@ -18,6 +18,7 @@ const m = {
         ],
         link: [
             {rel: 'icon', type: 'image/x-icon', href: `${DEPLOY_PATH}favicon.ico`},
+            {rel: 'stylesheet', href: 'https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700'},
             {rel: 'stylesheet', href: `${DEPLOY_PATH}plugins/fontawesome-free/css/all.min.css`},
             {rel: 'stylesheet', href: 'https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css'},
             {rel: 'stylesheet', href: `${DEPLOY_PATH}plugins/icheck-bootstrap/icheck-bootstrap.min.css`},
@@ -26,7 +27,6 @@ const m = {
             {rel: 'stylesheet', href: `${DEPLOY_PATH}dist/css/adminlte.min.css`},
             {rel: 'stylesheet', href: `${DEPLOY_PATH}plugins/overlayScrollbars/css/OverlayScrollbars.min.css`},
             //{rel: 'stylesheet', href: `${DEPLOY_PATH}plugins/daterangepicker/daterangepicker.css`},
-            {rel: 'stylesheet', href: 'https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700'}
         ],
         script: [
             {src: `${DEPLOY_PATH}plugins/jquery/jquery.min.js`, body: true},
@@ -48,7 +48,7 @@ const m = {
     // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
     plugins: [
         '~/libs/format.js',
-        '@/plugins/sw-update.js',
+        //'@/plugins/sw-update.js',
     ],
 
     // Auto import components: https://go.nuxtjs.dev/config-components
@@ -116,7 +116,7 @@ const m = {
     }
 }
 
-const precaches = [];
+const precaches = [{url: DEPLOY_PATH + '?'}];
 const revision = null;
 
 m.head.link.forEach(link => {

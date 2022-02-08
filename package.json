@@ -6,7 +6,7 @@
     "dev": "nuxt",
     "build": "nuxt build",
     "start": "nuxt start",
-    "generate": "nuxt generate && yarn precache",
+    "generate": "nuxt generate",
     "precache": "node nii precache",
     "test": "jest"
   },
