@@ -4,7 +4,7 @@
             <li class="nav-item">
                 <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
             </li>
-            <li class="nav-item d-none d-sm-inline-block">
+            <li class="nav-item d-inline-block d-sm-none">
                 <NuxtLink to="/" class="nav-link">Home</nuxtlink>
             </li>
         </ul>
@@ -40,6 +40,6 @@
             update() {
                 window.location.reload();
             }
-        }
+        },
     }
 </script>

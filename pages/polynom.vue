@@ -5,8 +5,8 @@
                 <div class="row">
                     <div class="col-lg-6 col-sm-12">
                         <div class="form-group row">
-                            <label for="body" class="col-sm-4 col-form-label">Objek</label>
-                            <div class="col-sm-8">
+                            <label for="body" class="col-4 col-form-label">Objek</label>
+                            <div class="col-8">
                                 <select id="body" class="form-control" v-model="model.body">
                                     <option value="sun">Matahari</option>
                                     <option value="moon">Bulan</option>
@@ -14,8 +14,8 @@
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label for="unit" class="col-sm-4 col-form-label">Satuan</label>
-                            <div class="col-sm-8">
+                            <label for="unit" class="col-4 col-form-label">Satuan</label>
+                            <div class="col-8">
                                 <select id="unit" class="form-control" v-model="model.unit">
                                     <option value="deg">Derajat</option>
                                     <option value="rad">Radian</option>
@@ -23,8 +23,8 @@
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label for="orde" class="col-sm-4 col-form-label">Orde Polinomial</label>
-                            <div class="col-sm-8">
+                            <label for="orde" class="col-4 col-form-label">Orde Polinomial</label>
+                            <div class="col-8">
                                 <select class="form-control" v-model='model.orde'>
                                     <option  v-for="n in 8" :value="n+1">{{n+1}}</option>
                                 </select>
@@ -33,22 +33,22 @@
                     </div>
                     <div class="col-lg-6 col-sm-12">
                         <div class="form-group row">
-                            <label for="T0" class="col-sm-4 col-form-label">T0</label>
-                            <div class="col-sm-8">
+                            <label for="T0" class="col-4 col-form-label">T0</label>
+                            <div class="col-8">
                                 <input type="text" class="form-control" id="T0" v-model="model.T0"
                                        placeholder="YYYY-MM-dd HH:mm:ss">
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label for="dari" class="col-sm-4 col-form-label">Dari</label>
-                            <div class="col-sm-8">
+                            <label for="dari" class="col-4 col-form-label">Dari</label>
+                            <div class="col-8">
                                 <input type="text" class="form-control" id="dari" v-model="model.from"
                                        placeholder="YYYY-MM-dd HH:mm:ss">
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label for="sampai" class="col-sm-4 col-form-label">Sampai</label>
-                            <div class="col-sm-8">
+                            <label for="sampai" class="col-4 col-form-label">Sampai</label>
+                            <div class="col-8">
                                 <input type="text" class="form-control" id="sampai" v-model="model.to"
                                        placeholder="YYYY-MM-dd HH:mm:ss">
                             </div>

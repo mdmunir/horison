@@ -15,8 +15,6 @@ export class Hilal {
      * @param {Number} m 
      */
     constructor(y, m) {
-        const BEGIN = -15 / 24;
-        const END = 48 / 24;
         this.k = 12 * y + m - 17050;
 
         this.y = this.k / 12.3685 + 2000;
@@ -25,6 +23,12 @@ export class Hilal {
         let jde = moonphase.newMoon(this.y);
         this.meeusConjunction = jde - this.deltaT / 86400;
         this.T0 = floor(jde + 0.5);
+        let jam = floor((jde - this.TO) * 24) / 24;
+
+        const BEGIN = jam - 1.25;
+        const END = jam + 1.75;
+        this.begin = BEGIN + this.T0;
+        this.end = END + this.T0;
 
         const solar = new position.Solar(true, 4);
         const moon = new position.Moon(true, 4);
@@ -68,8 +72,8 @@ export class Hilal {
     }
 
     info() {
-        const {deltaT, meeusConjunction, conjunction, equatorConjunction, T0, } = this;
-        return {deltaT, meeusConjunction, conjunction, equatorConjunction, T0,
+        const {deltaT, meeusConjunction, conjunction, equatorConjunction, T0, begin, end} = this;
+        return {deltaT, meeusConjunction, conjunction, equatorConjunction, T0, begin, end,
             suns: this.sunPolynom.POLYNOM,
             moons: this.moonPolynom.POLYNOM,
         };

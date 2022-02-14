@@ -5,14 +5,14 @@
                 <div class="col-lg-4 col-sm-12">
                     <form class="form-horizontal">
                         <div class="form-group row">
-                            <label for="time" class="col-sm-4 col-form-label">Waktu</label>
-                            <div class="col-sm-8">
+                            <label for="time" class="col-4 col-form-label">Waktu</label>
+                            <div class="col-8">
                                 <input type="text" class="form-control" id="time" v-model="model.time"
                                        placeholder="YYYY-MM-dd HH:mm:ss">
                             </div>
                         </div>
                         <div class="form-group row">
-                            <div class="offset-sm-4 col-sm-8">
+                            <div class="offset-4 col-8">
                                 <button class="btn btn-sm btn-primary" @click="submit()">Generate</button>
                             </div>
                         </div>

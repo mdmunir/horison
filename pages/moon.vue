@@ -2,42 +2,42 @@
     <lte-content title="Posisi Bulan">
         <lte-card buttons="collapse">
             <div class="row">
-                <div class="col-lg-4 col-sm-12">
+                <div class="col-md-4 col-12">
                     <lte-card>
                         <form class="form-horizontal">
                             <div class="form-group row">
-                                <label for="latitude" class="col-sm-4 col-form-label">Latitude</label>
-                                <div class="col-sm-8">
-                                    <input type="number" class="form-control" id="latitude" v-model.number="model.lat"
+                                <label for="latitude" class="col-4 col-form-label">Latitude</label>
+                                <div class="col-8">
+                                    <input type="number" step="any" class="form-control" id="latitude" v-model.number="model.lat"
                                            placeholder="Latitude">
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label for="longitude" class="col-sm-4 col-form-label">Longitude</label>
-                                <div class="col-sm-8">
-                                    <input type="number" class="form-control" id="longitude" v-model.number="model.lon"
+                                <label for="longitude" class="col-4 col-form-label">Longitude</label>
+                                <div class="col-8">
+                                    <input type="number" step="any" class="form-control" id="longitude" v-model.number="model.lon"
                                            placeholder="Longitude">
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label for="dari" class="col-sm-4 col-form-label">Dari</label>
-                                <div class="col-sm-8">
+                                <label for="dari" class="col-4 col-form-label">Dari</label>
+                                <div class="col-8">
                                     <input type="text" class="form-control" id="dari" v-model="model.from"
                                            placeholder="YYYY-MM-dd HH:mm:ss">
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label for="sampai" class="col-sm-4 col-form-label">Sampai</label>
-                                <div class="col-sm-8">
+                                <label for="sampai" class="col-4 col-form-label">Sampai</label>
+                                <div class="col-8">
                                     <input type="text" class="form-control" id="sampai" v-model="model.to"
                                            placeholder="YYYY-MM-dd HH:mm:ss">
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label for="interval" class="col-sm-4 col-form-label">Interval</label>
-                                <div class="col-sm-8">
+                                <label for="interval" class="col-4 col-form-label">Interval</label>
+                                <div class="col-8">
                                     <div class="input-group">
-                                        <input type="number" class="form-control" id="interval" v-model.number="model.interval">
+                                        <input type="number" step="any" class="form-control" id="interval" v-model.number="model.interval">
                                         <select class="form-control" v-model='model.unit'>
                                             <option  v-for="(v,k) in units"  :value="k">{{v.label}}</option>
                                         </select>
@@ -45,18 +45,18 @@
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <div class="offset-sm-4 col-sm-8">
+                                <div class="offset-4 col-8">
                                     <button class="btn btn-sm btn-primary" @click="submit()">Generate</button>
                                 </div>
                             </div>
                         </form>
                     </lte-card>
                 </div>
-                <div class="col-lg-8 col-sm-12">
+                <div class="col-md-8 col-12">
                     <lte-card>
                         <form class="form-horizontal">
                             <div class="row">
-                                <div class="col-lg-4">
+                                <div class="col-lg-4 col-12">
                                     <div class="form-group row">
                                         <label for="sudut" class="col-sm-6 col-form-label">Format Sudut</label>
                                         <div class="col-sm-6">
@@ -67,7 +67,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-lg-4" v-for="cols in columnsChunk">
+                                <div class="col-lg-4 col-6" v-for="cols in columnsChunk">
                                     <div class="form-check" v-for="col in cols">
                                         <input type="checkbox" class="form-check-input" :id="'ck_'+col.key"  v-model="col.value">
                                         <label class="form-check-label" :for="'ck_'+col.key">{{col.label}}</label>

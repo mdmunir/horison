@@ -3,8 +3,8 @@
         <div class="row">
             <div class="col-sm-6">
                 <div class="form-group row">
-                    <label for="location" class="col-sm-4 col-form-label">Lokasi</label>
-                    <div class="col-sm-8">
+                    <label for="location" class="col-4 col-form-label">Lokasi</label>
+                    <div class="col-8">
                         <select2 class="form-control" id="location"
                                  v-model="model.id" @selection="locationChange"
                                  :options="locations">
@@ -12,32 +12,32 @@
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label for="latitude" class="col-sm-4 col-form-label">Latitude</label>
-                    <div class="col-sm-8">
-                        <input type="number" class="form-control" id="latitude"
+                    <label for="latitude" class="col-4 col-form-label">Latitude</label>
+                    <div class="col-8">
+                        <input type="number" step="any" class="form-control" id="latitude"
                                placeholder="Latitude" v-model.number="model.lat">
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label for="longitude" class="col-sm-4 col-form-label">Longitude</label>
-                    <div class="col-sm-8">
-                        <input type="number" class="form-control" id="longitude"
+                    <label for="longitude" class="col-4 col-form-label">Longitude</label>
+                    <div class="col-8">
+                        <input type="number" step="any" class="form-control" id="longitude"
                                placeholder="Longitude" v-model.number="model.lon">
                     </div>
                 </div>
             </div>
             <div class="col-sm-6">
                 <div class="form-group row">
-                    <label for="timezone" class="col-sm-4 col-form-label">Timezone</label>
-                    <div class="col-sm-8">
+                    <label for="timezone" class="col-4 col-form-label">Timezone</label>
+                    <div class="col-8">
                         <select2 id='timezone' v-model='model.timezone' :options="timezones"
                                  class="form-control" @selection="timezoneChange"></select2>
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label for="height" class="col-sm-4 col-form-label">Ketinggian</label>
-                    <div class="col-sm-8">
-                        <input type="number" class="form-control" id="height"
+                    <label for="height" class="col-4 col-form-label">Ketinggian</label>
+                    <div class="col-8">
+                        <input type="number" step="any" class="form-control" id="height"
                                placeholder="Ketinggian" v-model.number="model.height">
                     </div>
                 </div>

@@ -1,18 +1,21 @@
 <template>
     <lte-content :title="false">
-        <lte-card title="Waktu Shalat">
-            <table class="table">
-                <tr v-for="item in times">
-                    <td>{{item.label}}</td>
-                    <td style="text-align: right;">{{item.stime}}</td>
-                </tr>
-            </table>
-        </lte-card>
+        <h5>{{latLon}}</h5>
+        <div class="row">
+            <div class="col-md-2 col-4" v-for="item in times">
+                <div class="info-box bg-success">
+                    <div class="info-box-content">
+                        <span class="info-box-text">{{item.label}}</span>
+                        <span class="info-box-number">{{item.stime}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </lte-content>
 </template>
 
 <script>
-    import {now} from '@/libs/horison';
+    import {now, Globe} from '@/libs/horison';
     import calcPrayer from '@/libs/prayer';
 
     const LABELS = {
@@ -40,7 +43,10 @@
                     v.stime = moment(v.time).utcOffset(zone).format('HH:mm');
                     v.label = LABELS[v.name]
                     return v;
-                });
+                }).filter(v => v.name != 'tengah' && v.name != 'pertiga');
+            },
+            latLon() {
+                return Globe.fromLoc(this.$store.state.location).toString();
             }
         },
     }
