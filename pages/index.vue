@@ -25,8 +25,6 @@
         ashar: 'Ashar',
         maghrib: 'Maghrib',
         isya: 'Isya',
-        tengah: 'Pertengahan Malam',
-        pertiga: 'Sepertiga Malam Akhir',
     }
     export default {
         head: {
@@ -40,10 +38,13 @@
                 const zone = loc.offset || 420;
                 let list = calcPrayer(y, m, d, loc, config);
                 return list.map(v => {
-                    v.stime = moment(v.time).utcOffset(zone).format('HH:mm');
-                    v.label = LABELS[v.name]
-                    return v;
-                }).filter(v => v.name != 'tengah' && v.name != 'pertiga');
+                    if (LABELS[v.name]) {
+                        v.stime = moment(v.time).utcOffset(zone).format('HH:mm');
+                        v.label = LABELS[v.name]
+                        return v;
+                    }
+                    return false;
+                }).filter(v => v);
             },
             latLon() {
                 return Globe.fromLoc(this.$store.state.location).toString();

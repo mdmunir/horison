@@ -28,6 +28,7 @@
     const columns = [
         {key: 'subuh', label: 'Subuh', value: true, },
         {key: 'terbit', label: 'Terbit', value: true, },
+        {key: 'dhuha', label: 'Dhuha', value: true, },
         {key: 'dzuhur', label: 'Dzuhur', value: true, },
         {key: 'ashar', label: 'Ashar', value: true, },
         {key: 'maghrib', label: 'Maghrib', value: true, },
@@ -39,6 +40,7 @@
     const LABELS = {
         subuh: 'Subuh',
         terbit: 'Terbit',
+        dhuha: 'Dhuha',
         dzuhur: 'Dzuhur',
         ashar: 'Ashar',
         maghrib: 'Maghrib',

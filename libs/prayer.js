@@ -85,6 +85,11 @@ function calcPrayer(y, m, d, loc, c) {
     jd = calcH(JDL, H0, loc, -1);
     list.push({name: 'terbit', jd});
 
+    // subuh    
+    H0 = (config.alt_dhuha || 4.5) * D2R;
+    jd = calcH(JDL, H0, loc, -1);
+    list.push({name: 'dhuha', jd});
+
     // dzuhur
     jd = calcNoon(JDL);
     list.push({name: 'dzuhur', jd});

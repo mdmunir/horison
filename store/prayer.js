@@ -2,7 +2,9 @@ export const state = () => {
     return Object.assign({
         alt_subuh: -20,
         alt_isya: -18,
+        alt_dhuha: 4.5,
         subuh: 2,
+        dhuha: 2,
         dzuhur: 2,
         ashar: 2,
         maghrib: 2,

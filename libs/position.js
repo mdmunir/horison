@@ -96,9 +96,9 @@ export class Polynom {
         const max = {};
         const {POLYNOM, func, T0} = this;
 
-        const [begin, end, orde] = this.testX;
-        for (let i = 0; i <= orde; i++) {
-            let x = (i / orde) * (end - begin) + begin;
+        const [begin, end, count] = this.testX;
+        for (let i = 0; i <= count; i++) {
+            let x = (i / count) * (end - begin) + begin;
             let jd = T0 + x;
             let jde = jd + deltaTJD(jd) / 86400;
             let {lon, lat, range, ra, dec} = this.origin(jde);
@@ -186,6 +186,26 @@ export class Polynom {
                 break;
             }
         }
+        return x + this.T0;
+    }
+
+    noon(jd, g, sign) {
+        let x = jd - this.T0, lha, Δjd;
+        let HA = sign ? PI : 0;
+        const {GHA} = this.POLYNOM;
+
+        for (let i = 0; i < 10; i++) {
+            lha = base.pmod(base.horner(x, GHA) - g.lon + HA, PI_2) - PI;
+            Δjd = -lha / PI_2;
+            if (i == 0 && Δjd < 0) {
+                Δjd += 1;
+            }
+            x += Δjd;
+            if (Δjd < ERR) {
+                break;
+            }
+        }
+
         return x + this.T0;
     }
 }

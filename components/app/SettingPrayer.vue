@@ -18,6 +18,13 @@
                     </div>
                 </div>
                 <div class="form-group row">
+                    <label for="dhuha" class="col-4 col-form-label">Dhuha</label>
+                    <div class="col-8">
+                        <input type="number" step="any" class="form-control" id="dhuha"
+                               placeholder="Koreksi dhuha" v-model.number="model.dhuha">
+                    </div>
+                </div>
+                <div class="form-group row">
                     <label for="dzuhur" class="col-4 col-form-label">Dzuhur</label>
                     <div class="col-8">
                         <input type="number" step="any" class="form-control" id="dzuhur"
@@ -60,6 +67,13 @@
                     <div class="col-8">
                         <input type="number" step="any" class="form-control" id="alt_isya"
                                placeholder="Altitude isya" v-model.number="model.alt_isya">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="alt_dhuha" class="col-4 col-form-label">Altitude dhuha</label>
+                    <div class="col-8">
+                        <input type="number" step="any" class="form-control" id="alt_dhuha"
+                               placeholder="Altitude dhuha" v-model.number="model.alt_dhuha">
                     </div>
                 </div>
             </div>
