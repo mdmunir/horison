@@ -257,9 +257,14 @@ export function toHorizontal2(pos, g) {
 }
 
 export class Globe {
-    constructor(lon, lat) {
-        this.lon = lon;
-        this.lat = lat;
+    constructor(lon, lat, height) {
+        let o = {};
+        if(typeof lon === 'object'){
+            o = lon;
+        }
+        this.lon = o.lon || lon;
+        this.lat = o.lat || lat;
+        this.height = o.height || height || 0;
     }
 
     toString() {
@@ -272,11 +277,12 @@ export class Globe {
         return {
             lon: -this.lon * R2D,
             lat: this.lat * R2D,
+            height: this.height,
         }
     }
 
     static fromLoc(loc) {
-        return new Globe(-loc.lon * D2R, loc.lat * D2R);
+        return new Globe(-loc.lon * D2R, loc.lat * D2R, loc.height || 0);
     }
 }
 

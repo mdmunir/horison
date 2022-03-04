@@ -118,13 +118,17 @@ export class Hilal {
         // sun set.
         let alt = -50 / 60 * D2R;
         let sunSet = this.sunPolynom.rise(jd, g, alt, 1);
-        alt = 0.125 * D2R; // standar refraksi bulan.
-        let moonSet = this.moonPolynom.rise(jd - 1.5 / 24, g, alt, 1);
+
         const sunPos = this.sunPolynom.calc(sunSet, g);
         const moonPos = this.moonPolynom.calc(sunSet, g);
+        moonPos.alt += moonPos.sd;
+
+        alt = -34 / 60 * D2R + moonPos.hp + moonPos.sd; // altitude terbenam bulan
+        let moonSet = this.moonPolynom.rise(jd - 1.5 / 24, g, alt, 1);
         const result = {
             sunSet, sunPos, moonSet, moonPos,
             age: sunSet - this.conjunction,
+            duration: moonSet - sunSet,
         };
         result.elongation = angle.sep(sunPos, moonPos);
         const [sψ, cψ] = base.sincos(result.elongation);

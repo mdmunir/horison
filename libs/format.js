@@ -35,6 +35,28 @@ Number.prototype.dms = function (fixed = 2, compact = false) {
     return (neg ? '-' : '') + result;
 }
 
+Number.prototype.asDuration = function (fixed = 2, compact = false) {
+    let value = this;
+    let neg = value < 0;
+    value = abs(value);
+    let d = floor(value);
+    let m = floor((value - d) * 60);
+    let s = (value - d - m / 60) * 3600;
+
+    let result = '';
+    if (compact && d == 0 && m == 0) {
+        result = `${s.toFixed(fixed)}ˢ`;
+    } else if (compact && d == 0) {
+        s = (s < 10 ? '0' : '') + s.toFixed(fixed);
+        result = `${m}ᵐ${s}ˢ`;
+    } else {
+        m = (m < 10 ? '0' : '') + m;
+        s = (s < 10 ? '0' : '') + s.toFixed(fixed);
+        result = `${d}ʰ${m}ᵐ${s}ˢ`;
+    }
+    return (neg ? '-' : '') + result;
+}
+
 Number.prototype.toScientific = function (digit, f) {
     let n = Math.log10(Math.abs(this));
     if (n > digit) {

@@ -2,12 +2,13 @@ import angle from 'astronomia/src/angle';
 import base from 'astronomia/src/base';
 import interpolation from 'astronomia/src/interpolation';
 import rise from 'astronomia/src/rise';
+import {saemundsson} from 'astronomia/src/refraction';
 
 import solar from './solar';
 import moon from './moon';
 import {obliquity, toEquatorial, toHorizontal, toHorizontal2, deltaTJD, GST} from './horison';
 
-const {cos, sin, tan, atan, atan2, asin, acos, abs, floor, PI} = Math;
+const {cos, sin, tan, atan, atan2, asin, acos, abs, floor, sqrt, PI} = Math;
 
 export const D2R = PI / 180;
 export const R2D = 180 / PI;
@@ -21,6 +22,17 @@ const EARTH_RADIUS = 6378.137; // km
 const SUN_RADIUS = 695991.75; // km
 const MOON_RADIUS = 1737.928; // km
 const ERR = 1e-6;
+
+export function elevation(height) {
+    if (!height) {
+        return 0;
+    }
+    if (height >= 0) {
+        return 0.0347 * D2R * sqrt(height);
+    } else {
+        return -0.0347 * D2R * sqrt(-height);
+    }
+}
 
 export class Polynom {
     /**
@@ -164,6 +176,9 @@ export class Polynom {
             result.lha = result.gha - g.lon;
             let {alt, az} = toHorizontal2(result, g);
             alt -= result.hp * cos(alt);
+            alt += saemundsson(alt);
+            alt += elevation(g.height);
+
             result.alt = alt;
             result.az = az;
         }
@@ -250,6 +265,8 @@ export class Position {
             result.lha = result.gha - g.lon;
             let {alt, az} = toHorizontal2(result, g);
             alt -= result.hp * cos(alt);
+            alt += saemundsson(alt);
+            alt += elevation(g.height);
             result.alt = alt;
             result.az = az;
         }

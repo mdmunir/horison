@@ -43,6 +43,7 @@
         {key: 'age', label: 'Umur Bulan'},
         {key: 'fraction', label: 'FIB(%)'},
         {key: 'moonSet', label: 'Moonset'},
+        {key: 'duration', label: 'Lama Bulan'},
     ];
     export default {
         head: {
@@ -111,6 +112,7 @@
                         sunSet: moment(sunSet).utcOffset(offset).format('HH:mm:ss'),
                         moonSet: moment(Date.fromJD(info.moonSet)).utcOffset(offset).format('HH:mm:ss'),
                         age: '-',
+                        duration: '-',
                         moonAlt: info.moonPos.alt * R2D,
                         moonAz: base.pmod(info.moonPos.az * R2D + 180, 360),
                         sunAz: base.pmod(info.sunPos.az * R2D + 180, 360),
@@ -118,11 +120,20 @@
                         fraction: info.fraction * 100,
                     }
                     if (info.age > 0) {
-                        let age = info.age * 24;
-                        let h = floor(age);
-                        let m = floor((age - h) * 60);
-                        row.age = `${h < 10 ? '0' + h : h}:${m < 10 ? '0' + m : m}`;
+                        row.age = (info.age * 24).asDuration(0, true);
+//                        let age = info.age * 24;
+//                        let h = floor(age);
+//                        let m = floor((age - h) * 60);
+//                        row.age = `${h < 10 ? '0' + h : h}:${m < 10 ? '0' + m : m}`;
                     }
+                    if (info.duration > 0) {
+                        row.duration = (info.duration * 24).asDuration(0, true);
+//                        let age = info.age * 24;
+//                        let h = floor(age);
+//                        let m = floor((age - h) * 60);
+//                        row.age = `${h < 10 ? '0' + h : h}:${m < 10 ? '0' + m : m}`;
+                    }
+
                     result.push(row);
                 });
                 this.rows = result;
@@ -151,10 +162,10 @@
 
                 let l = `Data         : Hilal Wilayah Indonesia
 Bulan        : ${this.info.month} ${this.info.year}
-Konjungsi    : ${moment(this.info.conjunction).utc().format('YYYY-MM-DD HH:mm:ss')} UT
-             : ${moment(this.info.conjunction).utcOffset(60 * 7).format('YYYY-MM-DD HH:mm:ss')} WIB
-             : ${moment(this.info.conjunction).utcOffset(60 * 8).format('YYYY-MM-DD HH:mm:ss')} WITA
-             : ${moment(this.info.conjunction).utcOffset(60 * 9).format('YYYY-MM-DD HH:mm:ss')} WIT
+Konjungsi    : ${moment(this.info.conjunction).utc().format('YYYY-MM-DD HH:mm:ss.S')} UT
+             : ${moment(this.info.conjunction).utcOffset(60 * 7).format('YYYY-MM-DD HH:mm:ss.S')} WIB
+             : ${moment(this.info.conjunction).utcOffset(60 * 8).format('YYYY-MM-DD HH:mm:ss.S')} WITA
+             : ${moment(this.info.conjunction).utcOffset(60 * 9).format('YYYY-MM-DD HH:mm:ss.S')} WIT
 ${garis}
 ${lb}
 ${garis}\n`;
@@ -166,15 +177,11 @@ ${garis}\n`;
                         switch (key) {
                             case 'name':
                                 return val.padEnd(45, ' ');
-                            case 'zone':
-                            case 'date':
-                            case 'sunSet':
-                            case 'moonSet':
-                            case 'age':
-                                return val.padStart(15, ' ');
                             default:
-                                //return val;
-                                return val.toFixed(6).padStart(15, ' ');
+                                if(typeof val === 'number'){
+                                    return val.toFixed(6).padStart(15, ' ');
+                                }
+                                return val.padStart(15, ' ');
                         }
                     }).join('');
                 }).join('\n');
