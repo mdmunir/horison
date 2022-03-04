@@ -7,6 +7,11 @@
                     <nuxt-link class="page-link" :to="link.to">{{link.label}}</nuxt-link>
                     </li>
                 </ul>
+                <ul class="pagination pagination-sm float-left">
+                    <li class="page-item" v-for="d in 3" :class="{'active':model.d == (d-2)}">
+                        <a href="javascript:void(0)" class="page-link" @click="setDay(d-2)">{{d-2}}</a>
+                    </li>
+                </ul>
                 <a v-if="rows.length" class="btn btn-tool" :href="contentDownload" download="hilal-wilayah-indonesia.txt">
                     <i class="fas fa-save"></i>
                 </a>
@@ -21,6 +26,8 @@
     import {Hilal, currentMonth, MONTHS} from '@/libs/hijriyah';
     import locations from '@/libs/location';
     import base from 'astronomia/src/base';
+
+    const {floor} = Math;
 
     const columns = [
         {key: 'name', label: 'Lokasi'},
@@ -47,6 +54,7 @@
                 model: {
                     m: m,
                     y: y,
+                    d: 0,
                 },
                 columns: columns,
                 rows: [],
@@ -56,6 +64,7 @@
         watch: {
             '$route.query': function (v) {
                 this.setData(v);
+                this.model.d = 0;
                 this.calcList();
             }
         },
@@ -64,10 +73,17 @@
             this.calcList();
         },
         methods: {
+            setDay(v) {
+                this.model.d = v;
+                this.calcList();
+            },
             setData(v) {
                 const [y, m] = currentMonth();
                 this.model.y = (v.y || y) * 1;
                 this.model.m = (v.m || m) * 1;
+
+                this.model.y = floor(this.model.y);
+                this.model.m = floor(this.model.m);
                 if (this.model.m < 1) {
                     this.model.m = 1;
                 }
@@ -76,7 +92,7 @@
                 }
             },
             calcList() {
-                const {y, m} = this.model;
+                const {y, m, d} = this.model;
                 const hilal = new Hilal(y, m);
                 const {conjunction, meeusConjunction} = hilal.info();
                 this.info.conjunction = Date.fromJD(conjunction);
@@ -86,19 +102,26 @@
                 locations.forEach(loc => {
                     let offset = parseFloat(loc.zone) * 60;
                     const g = Globe.fromLoc(loc);
-                    const info = hilal.calc(g);
+                    const info = hilal.calc(g, d);
                     const sunSet = Date.fromJD(info.sunSet);
                     const row = {
-                        name: loc.name, lat: loc.lat, lon: loc.lon, zone: loc.zone,
+                        name: loc.name, lat: loc.lat, lon: loc.lon,
+                        zone: 'GMT' + loc.zone,
                         date: moment(sunSet).utcOffset(offset).format('YYYY-MM-DD'),
                         sunSet: moment(sunSet).utcOffset(offset).format('HH:mm:ss'),
                         moonSet: moment(Date.fromJD(info.moonSet)).utcOffset(offset).format('HH:mm:ss'),
-                        age: info.age > 0 ? moment(info.age * 24 * 3600000).utc().format('HH:mm:ss') : '-',
+                        age: '-',
                         moonAlt: info.moonPos.alt * R2D,
                         moonAz: base.pmod(info.moonPos.az * R2D + 180, 360),
                         sunAz: base.pmod(info.sunPos.az * R2D + 180, 360),
                         elongation: info.elongation * R2D,
                         fraction: info.fraction * 100,
+                    }
+                    if (info.age > 0) {
+                        let age = info.age * 24;
+                        let h = floor(age);
+                        let m = floor((age - h) * 60);
+                        row.age = `${h < 10 ? '0' + h : h}:${m < 10 ? '0' + m : m}`;
                     }
                     result.push(row);
                 });

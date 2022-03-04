@@ -51,10 +51,10 @@ export class Hilal {
         this.meeusConjunction = jde - this.deltaT / 86400;
         this.T0 = floor(jde);
         let jam = floor((jde - this.T0) * 24) / 24;
-        this.HOUR0 = this.T0 + jam;
+        this.H0 = this.T0 + jam;
 
         const BEGIN = jam - 1.25;
-        const END = jam + 1.75;
+        const END = jam + 2;
         this.begin = BEGIN + this.T0;
         this.end = END + this.T0;
 
@@ -114,10 +114,11 @@ export class Hilal {
      * @return {Object}
      */
     calc(g, day = 0) {
-        let jd = this.HOUR0 + day;
+        let jd = this.H0 + day;
         // sun set.
-        let alt = 50 / 60 * D2R;
+        let alt = -50 / 60 * D2R;
         let sunSet = this.sunPolynom.rise(jd, g, alt, 1);
+        alt = 0.125 * D2R; // standar refraksi bulan.
         let moonSet = this.moonPolynom.rise(jd - 1.5 / 24, g, alt, 1);
         const sunPos = this.sunPolynom.calc(sunSet, g);
         const moonPos = this.moonPolynom.calc(sunSet, g);
