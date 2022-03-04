@@ -4,9 +4,36 @@ import angle from 'astronomia/src/angle';
 import horison from './horison';
 import position from './position';
 
-const {PI, abs, atan, cos} = Math;
+const {PI, abs, atan, cos, floor} = Math;
 const D2R = PI / 180;
 const ERR = 1e-6;
+
+const _MONTHS = [
+    'Muharram',
+    'Shafar',
+    'Rabiul Awal',
+    'Rabiul Akhir',
+    'Jumadil Awal',
+    'Jumadil Akhir',
+    'Rajab',
+    "Sya'ban",
+    'Ramadhan',
+    'Syawal',
+    "Dzulqa'dah",
+    'Dzulhijah',
+];
+
+export const MONTHS = _MONTHS.map((v, i) => {
+    return {id: i + 1, name: v};
+});
+
+export function currentMonth(d = 0) {
+    let d2000 = (new Date).toJD() - 2451545.0 + d;
+    let k = floor(d2000 / 29.53066257024) + 17050 - 1;
+    let y = floor(k / 12);
+    let m = k % 12;
+    return [y, m + 1];
+}
 
 export class Hilal {
     /**
@@ -22,8 +49,9 @@ export class Hilal {
 
         let jde = moonphase.newMoon(this.y);
         this.meeusConjunction = jde - this.deltaT / 86400;
-        this.T0 = floor(jde + 0.5);
-        let jam = floor((jde - this.TO) * 24) / 24;
+        this.T0 = floor(jde);
+        let jam = floor((jde - this.T0) * 24) / 24;
+        this.HOUR0 = this.T0 + jam;
 
         const BEGIN = jam - 1.25;
         const END = jam + 1.75;
@@ -51,7 +79,7 @@ export class Hilal {
             selisih = base.horner(tEc, moon.L) - base.horner(tEc, sun.L);
             selisih = base.pmod(selisih + PI, 2 * PI) - PI;
             dt = selisih * DELTA;
-            tEc += dt;
+            tEc -= dt;
             if (abs(dt) < ERR) {
                 break;
             }
@@ -62,7 +90,7 @@ export class Hilal {
             selisih = base.horner(tEq, moon.Ra) - base.horner(tEq, sun.Ra);
             selisih = base.pmod(selisih + PI, 2 * PI) - PI;
             dt = selisih * DELTA;
-            tEq += dt;
+            tEq -= dt;
             if (abs(dt) < ERR) {
                 break;
             }
@@ -82,18 +110,19 @@ export class Hilal {
     /**
      * 
      * @param {Object} g globe coordinate
-     * @param {day} day 
+     * @param {Number} day 
      * @return {Object}
      */
     calc(g, day = 0) {
-        let jd = this.conjunction + day;
+        let jd = this.HOUR0 + day;
         // sun set.
         let alt = 50 / 60 * D2R;
         let sunSet = this.sunPolynom.rise(jd, g, alt, 1);
+        let moonSet = this.moonPolynom.rise(jd - 1.5 / 24, g, alt, 1);
         const sunPos = this.sunPolynom.calc(sunSet, g);
         const moonPos = this.moonPolynom.calc(sunSet, g);
         const result = {
-            sunSet, sunPos, moonPos,
+            sunSet, sunPos, moonSet, moonPos,
             age: sunSet - this.conjunction,
         };
         result.elongation = angle.sep(sunPos, moonPos);
@@ -168,6 +197,10 @@ export class Hijriah {
         }
         return result;
     }
+
+    toJD(y, m = 1, d = 1) {
+
+    }
 }
 
 export class Aritmatic {
@@ -239,4 +272,4 @@ export class Aritmatic {
     }
 }
 
-export default {Hilal, Hijriah, Aritmatic}
+export default {Hilal, Hijriah, Aritmatic, currentMonth, MONTHS}

@@ -1,0 +1,166 @@
+<template>
+    <lte-content title="Hilal Wilayah Indonesia">
+        <lte-card>
+            <template #tools>
+                <ul class="pagination pagination-sm float-left">
+                    <li class="page-item" v-for="link in links">
+                    <nuxt-link class="page-link" :to="link.to">{{link.label}}</nuxt-link>
+                    </li>
+                </ul>
+                <a v-if="rows.length" class="btn btn-tool" :href="contentDownload" download="hilal-wilayah-indonesia.txt">
+                    <i class="fas fa-save"></i>
+                </a>
+            </template>
+            <pre>{{rowsStr}}</pre>
+        </lte-card>
+    </lte-content>
+</template>
+
+<script>
+    import {R2D, Globe} from '@/libs/horison';
+    import {Hilal, currentMonth, MONTHS} from '@/libs/hijriyah';
+    import locations from '@/libs/location';
+    import base from 'astronomia/src/base';
+
+    const columns = [
+        {key: 'name', label: 'Lokasi'},
+        {key: 'lat', label: 'Lintang'},
+        {key: 'lon', label: 'Bujur'},
+        {key: 'zone', label: 'Timezone'},
+        {key: 'date', label: 'Tanggal'},
+        {key: 'sunSet', label: 'Sunset'},
+        {key: 'sunAz', label: 'Az Matahari'},
+        {key: 'moonAz', label: 'Az Bulan'},
+        {key: 'moonAlt', label: 'Alt Bulan'},
+        {key: 'elongation', label: 'Elongasi'},
+        {key: 'age', label: 'Umur Bulan'},
+        {key: 'fraction', label: 'FIB(%)'},
+        {key: 'moonSet', label: 'Moonset'},
+    ];
+    export default {
+        head: {
+            title: 'Hilal Wilayah Indonesia',
+        },
+        data() {
+            const [y, m] = currentMonth();
+            return {
+                model: {
+                    m: m,
+                    y: y,
+                },
+                columns: columns,
+                rows: [],
+                info: {},
+            }
+        },
+        watch: {
+            '$route.query': function (v) {
+                this.setData(v);
+                this.calcList();
+            }
+        },
+        mounted() {
+            this.setData(this.$route.query);
+            this.calcList();
+        },
+        methods: {
+            setData(v) {
+                const [y, m] = currentMonth();
+                this.model.y = (v.y || y) * 1;
+                this.model.m = (v.m || m) * 1;
+                if (this.model.m < 1) {
+                    this.model.m = 1;
+                }
+                if (this.model.m > 12) {
+                    this.model.m = 12;
+                }
+            },
+            calcList() {
+                const {y, m} = this.model;
+                const hilal = new Hilal(y, m);
+                const {conjunction, meeusConjunction} = hilal.info();
+                this.info.conjunction = Date.fromJD(conjunction);
+                this.info.year = y;
+                this.info.month = MONTHS[m - 1].name;
+                const result = [];
+                locations.forEach(loc => {
+                    let offset = parseFloat(loc.zone) * 60;
+                    const g = Globe.fromLoc(loc);
+                    const info = hilal.calc(g);
+                    const sunSet = Date.fromJD(info.sunSet);
+                    const row = {
+                        name: loc.name, lat: loc.lat, lon: loc.lon, zone: loc.zone,
+                        date: moment(sunSet).utcOffset(offset).format('YYYY-MM-DD'),
+                        sunSet: moment(sunSet).utcOffset(offset).format('HH:mm:ss'),
+                        moonSet: moment(Date.fromJD(info.moonSet)).utcOffset(offset).format('HH:mm:ss'),
+                        age: info.age > 0 ? moment(info.age * 24 * 3600000).utc().format('HH:mm:ss') : '-',
+                        moonAlt: info.moonPos.alt * R2D,
+                        moonAz: base.pmod(info.moonPos.az * R2D + 180, 360),
+                        sunAz: base.pmod(info.sunPos.az * R2D + 180, 360),
+                        elongation: info.elongation * R2D,
+                        fraction: info.fraction * 100,
+                    }
+                    result.push(row);
+                });
+                this.rows = result;
+            },
+        },
+        computed: {
+            links() {
+                let {y, m} = this.model;
+                return [
+                    {to: {query: {y: y - 1, m: m}}, label: '«'},
+                    {to: {query: {y: (m <= 1 ? y - 1 : y), m: (m <= 1 ? 12 : m - 1)}}, label: '<'},
+                    {to: {query: {y, m}}, label: `${MONTHS[m - 1].name} ${y}`},
+                    {to: {query: {y: (m >= 12 ? y + 1 : y), m: (m >= 12 ? 1 : m + 1)}}, label: '>'},
+                    {to: {query: {y: y + 1, m: m}}, label: '»'},
+                ];
+            },
+            rowsStr() {
+                if (!this.rows.length) {
+                    return '';
+                }
+                const {y, m} = this.model;
+                let lb = columns.map((v, i) => {
+                    return i == 0 ? v.label.padMidle(45) : v.label.padMidle(15);
+                }).join('');
+                let garis = '*'.padStart(lb.length, '*');
+
+                let l = `Data         : Hilal Wilayah Indonesia
+Bulan        : ${this.info.month} ${this.info.year}
+Konjungsi    : ${moment(this.info.conjunction).utc().format('YYYY-MM-DD HH:mm:ss')} UT
+             : ${moment(this.info.conjunction).utcOffset(60 * 7).format('YYYY-MM-DD HH:mm:ss')} WIB
+             : ${moment(this.info.conjunction).utcOffset(60 * 8).format('YYYY-MM-DD HH:mm:ss')} WITA
+             : ${moment(this.info.conjunction).utcOffset(60 * 9).format('YYYY-MM-DD HH:mm:ss')} WIT
+${garis}
+${lb}
+${garis}\n`;
+
+                return l + this.rows.map(row => {
+                    return columns.map((v) => {
+                        let key = v.key;
+                        let val = row[key];
+                        switch (key) {
+                            case 'name':
+                                return val.padEnd(45, ' ');
+                            case 'zone':
+                            case 'date':
+                            case 'sunSet':
+                            case 'moonSet':
+                            case 'age':
+                                return val.padStart(15, ' ');
+                            default:
+                                //return val;
+                                return val.toFixed(6).padStart(15, ' ');
+                        }
+                    }).join('');
+                }).join('\n');
+            },
+            contentDownload() {
+                return URL.createObjectURL(new Blob([this.rowsStr], {
+                    type: 'plain/text',
+                }));
+            },
+        }
+    }
+</script>
