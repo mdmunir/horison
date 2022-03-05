@@ -143,10 +143,10 @@
                         limb: info.limb * R2D - 180,
                     }
                     if (info.age > 0) {
-                        row.age = (info.age * 24).asDuration(0, true);
+                        row.age = (info.age * 24).hms(0, true);
                     }
                     if (info.duration > 0) {
-                        row.duration = (info.duration * 24).asDuration(0, true);
+                        row.duration = (info.duration * 24).hms(0, true);
                     }
 
                     result.push(row);

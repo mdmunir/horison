@@ -13,48 +13,51 @@ String.prototype.padMidle = function (length, ch = ' ') {
     return s.padEnd(n, ch).padStart(length, ch);
 }
 
-Number.prototype.dms = function (fixed = 2, compact = false) {
-    let value = this;
+function hms(value, format, fixed = 2, compact = false) {
     let neg = value < 0;
     value = abs(value);
     let d = floor(value);
     let m = floor((value - d) * 60);
-    let s = (value - d - m / 60) * 3600;
+    let s = ((value - d - m / 60) * 3600).toFixed(fixed);
+    let s2 = parseFloat(s) < 10 ? '0' + s : s;
 
     let result = '';
     if (compact && d == 0 && m == 0) {
-        result = `${s.toFixed(fixed)}"`;
+        result = `${s}s`;
     } else if (compact && d == 0) {
-        s = (s < 10 ? '0' : '') + s.toFixed(fixed);
-        result = `${m}'${s}"`;
+        result = `${m}m${s2}s`;
     } else {
         m = (m < 10 ? '0' : '') + m;
-        s = (s < 10 ? '0' : '') + s.toFixed(fixed);
-        result = `${d}°${m}'${s}"`;
+        result = `${d}h${m}m${s2}s`;
+    }
+    switch (format) {
+        case 1: //
+            result = result.replace('h', '°').replace('m', "'").replace('s', '"');
+            break;
+        case 2: //
+            result = result.replace('h', 'ʰ').replace('m', 'ᵐ').replace('s', 'ˢ');
+            break;
+        case 3: //
+            result = result.replace('h', ':').replace('m', ':').replace('s', '');
+            break;
     }
     return (neg ? '-' : '') + result;
 }
 
-Number.prototype.asDuration = function (fixed = 2, compact = false) {
-    let value = this;
-    let neg = value < 0;
-    value = abs(value);
-    let d = floor(value);
-    let m = floor((value - d) * 60);
-    let s = (value - d - m / 60) * 3600;
+Number.prototype.dms = function (fixed = 2, compact = false) {
+    return hms(this, 1, fixed, compact);
+}
 
-    let result = '';
-    if (compact && d == 0 && m == 0) {
-        result = `${s.toFixed(fixed)}ˢ`;
-    } else if (compact && d == 0) {
-        s = (s < 10 ? '0' : '') + s.toFixed(fixed);
-        result = `${m}ᵐ${s}ˢ`;
-    } else {
-        m = (m < 10 ? '0' : '') + m;
-        s = (s < 10 ? '0' : '') + s.toFixed(fixed);
-        result = `${d}ʰ${m}ᵐ${s}ˢ`;
-    }
-    return (neg ? '-' : '') + result;
+Number.prototype.hms = function (fixed = 2, compact = false) {
+    return hms(this, 0, fixed, compact);
+}
+
+Number.prototype.hms2 = function (fixed = 2, compact = false) {
+    return hms(this, 2, fixed, compact);
+}
+
+Number.prototype.asTime = function (fixed = 2, compact = false) {
+    return hms(this, 3, fixed, compact);
 }
 
 Number.prototype.toScientific = function (digit, f) {
