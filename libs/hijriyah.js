@@ -123,12 +123,13 @@ export class Hilal {
         const moonPos = this.moonPolynom.calc(sunSet, g);
         moonPos.alt += moonPos.sd;
 
-        alt = -34 / 60 * D2R + moonPos.hp + moonPos.sd; // altitude terbenam bulan
-        let moonSet = this.moonPolynom.rise(jd - 1.5 / 24, g, alt, 1);
+        alt = -34 / 60 * D2R + moonPos.hp - moonPos.sd; // altitude terbenam bulan
+        let moonSet = this.moonPolynom.rise(sunSet - 2 / 24, g, alt, 1);
         const result = {
             sunSet, sunPos, moonSet, moonPos,
             age: sunSet - this.conjunction,
             duration: moonSet - sunSet,
+            limb: base.limb(moonPos, sunPos),
         };
         result.elongation = angle.sep(sunPos, moonPos);
         const [sψ, cψ] = base.sincos(result.elongation);

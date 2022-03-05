@@ -42,6 +42,7 @@
         {key: 'elongation', label: 'Elongasi'},
         {key: 'age', label: 'Umur Bulan'},
         {key: 'fraction', label: 'FIB(%)'},
+        {key: 'limb', label: 'Bright Limb'},
         {key: 'moonSet', label: 'Moonset'},
         {key: 'duration', label: 'Lama Bulan'},
     ];
@@ -95,8 +96,10 @@
             calcList() {
                 const {y, m, d} = this.model;
                 const hilal = new Hilal(y, m);
-                const {conjunction, meeusConjunction} = hilal.info();
+                const {conjunction, meeusConjunction, equatorConjunction} = hilal.info();
                 this.info.conjunction = Date.fromJD(conjunction);
+                this.info.meeusConjunction = Date.fromJD(meeusConjunction);
+                this.info.equatorConjunction = Date.fromJD(equatorConjunction);
                 this.info.year = y;
                 this.info.month = MONTHS[m - 1].name;
                 const result = [];
@@ -118,20 +121,13 @@
                         sunAz: base.pmod(info.sunPos.az * R2D + 180, 360),
                         elongation: info.elongation * R2D,
                         fraction: info.fraction * 100,
+                        limb: info.limb * R2D - 180,
                     }
                     if (info.age > 0) {
                         row.age = (info.age * 24).asDuration(0, true);
-//                        let age = info.age * 24;
-//                        let h = floor(age);
-//                        let m = floor((age - h) * 60);
-//                        row.age = `${h < 10 ? '0' + h : h}:${m < 10 ? '0' + m : m}`;
                     }
                     if (info.duration > 0) {
                         row.duration = (info.duration * 24).asDuration(0, true);
-//                        let age = info.age * 24;
-//                        let h = floor(age);
-//                        let m = floor((age - h) * 60);
-//                        row.age = `${h < 10 ? '0' + h : h}:${m < 10 ? '0' + m : m}`;
                     }
 
                     result.push(row);
@@ -160,12 +156,14 @@
                 }).join('');
                 let garis = '*'.padStart(lb.length, '*');
 
-                let l = `Data         : Hilal Wilayah Indonesia
-Bulan        : ${this.info.month} ${this.info.year}
-Konjungsi    : ${moment(this.info.conjunction).utc().format('YYYY-MM-DD HH:mm:ss.S')} UT
-             : ${moment(this.info.conjunction).utcOffset(60 * 7).format('YYYY-MM-DD HH:mm:ss.S')} WIB
-             : ${moment(this.info.conjunction).utcOffset(60 * 8).format('YYYY-MM-DD HH:mm:ss.S')} WITA
-             : ${moment(this.info.conjunction).utcOffset(60 * 9).format('YYYY-MM-DD HH:mm:ss.S')} WIT
+                let l = `Data                : Hilal Wilayah Indonesia
+Bulan               : ${this.info.month} ${this.info.year}
+Konjungsi(VSOP&ELP) : ${moment(this.info.conjunction).utc().format('YYYY-MM-DD HH:mm:ss.S')} UT
+                    : ${moment(this.info.conjunction).utcOffset(60 * 7).format('YYYY-MM-DD HH:mm:ss.S')} WIB
+                    : ${moment(this.info.conjunction).utcOffset(60 * 8).format('YYYY-MM-DD HH:mm:ss.S')} WITA
+                    : ${moment(this.info.conjunction).utcOffset(60 * 9).format('YYYY-MM-DD HH:mm:ss.S')} WIT
+Konjungsi(Meeus)    : ${moment(this.info.meeusConjunction).utc().format('YYYY-MM-DD HH:mm:ss.S')} UT
+Konjungsi(Ekuator)  : ${moment(this.info.equatorConjunction).utc().format('YYYY-MM-DD HH:mm:ss.S')} UT
 ${garis}
 ${lb}
 ${garis}\n`;
@@ -178,7 +176,7 @@ ${garis}\n`;
                             case 'name':
                                 return val.padEnd(45, ' ');
                             default:
-                                if(typeof val === 'number'){
+                                if (typeof val === 'number') {
                                     return val.toFixed(6).padStart(15, ' ');
                                 }
                                 return val.padStart(15, ' ');
