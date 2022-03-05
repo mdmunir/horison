@@ -8,38 +8,5 @@
                 <NuxtLink to="/" class="nav-link">Home</nuxtlink>
             </li>
         </ul>
-
-        <ul class="navbar-nav ml-auto">
-            <li class="nav-item" v-if="updated">
-                <a class="nav-link" href="#" role="button" @click="update">
-                    <i class="fas fa-sync-alt"></i>
-                </a>
-            </li>
-        </ul>
     </nav>
 </template>
-<script>
-    export default {
-        data() {
-            return {
-                updated: false,
-            }
-        },
-        async mounted() {
-            const vm = this;
-            const workbox = await window.$workbox;
-            if (workbox) {
-                workbox.addEventListener('installed', (event) => {
-                    if (event.isUpdate) {
-                        vm.updated = true;
-                    }
-                });
-            }
-        },
-        methods: {
-            update() {
-                window.location.reload();
-            }
-        },
-    }
-</script>

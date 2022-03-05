@@ -16,6 +16,24 @@
                     <i class="fas fa-save"></i>
                 </a>
             </template>
+            <div class="row">
+                <div class="col-md-4 col-sm-6 col-12">
+                    <div class="form-horizontal">
+                        <div class="form-group row">
+                            <label for="altitude" class="col-4 col-form-label">Altitude</label>
+                            <div class="col-8">
+                                <select class="form-control" id="altitude" v-model="model.altMethod" @change="calcList">
+                                    <option value="g">Geosentris</option>
+                                    <option value="t">Toposentris</option>
+                                    <option value="a">Apparent</option>
+                                    <option value="au">Apparent Upper</option>
+                                    <option value="al">Apparent Lower</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <pre>{{rowsStr}}</pre>
         </lte-card>
     </lte-content>
@@ -57,6 +75,7 @@
                     m: m,
                     y: y,
                     d: 0,
+                    altMethod:'a',
                 },
                 columns: columns,
                 rows: [],
@@ -94,7 +113,7 @@
                 }
             },
             calcList() {
-                const {y, m, d} = this.model;
+                const {y, m, d, altMethod} = this.model;
                 const hilal = new Hilal(y, m);
                 const {conjunction, meeusConjunction, equatorConjunction} = hilal.info();
                 this.info.conjunction = Date.fromJD(conjunction);
@@ -106,7 +125,7 @@
                 locations.forEach(loc => {
                     let offset = parseFloat(loc.zone) * 60;
                     const g = Globe.fromLoc(loc);
-                    const info = hilal.calc(g, d);
+                    const info = hilal.calc(g, d, altMethod);
                     const sunSet = Date.fromJD(info.sunSet);
                     const row = {
                         name: loc.name, lat: loc.lat, lon: loc.lon,

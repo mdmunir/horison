@@ -147,9 +147,10 @@ export class Polynom {
      * 
      * @param {Number} jd
      * @param {Object} g
+     * @param {String} altMethod
      * @returns {Object}
      */
-    calc(jd, g) {
+    calc(jd, g, altMethod = 'a') {
         const POLYNOM = this.POLYNOM;
         const x = jd - this.T0;
         const result = {
@@ -175,10 +176,26 @@ export class Polynom {
         if (g) {
             result.lha = result.gha - g.lon;
             let {alt, az} = toHorizontal2(result, g);
-            alt -= result.hp * cos(alt);
-            alt += saemundsson(alt);
-            alt += elevation(g.height);
-
+            switch (altMethod) {
+                case 't':
+                    alt -= result.hp * cos(alt);
+                    alt += elevation(g.height);
+                    break;
+                case 'a':
+                    alt -= result.hp * cos(alt);
+                    alt += saemundsson(alt);
+                    alt += elevation(g.height);
+                    break;
+                case 'au':
+                case 'al':
+                    alt -= result.hp * cos(alt);
+                    alt += saemundsson(alt);
+                    alt += elevation(g.height);
+                    alt += (altMethod == 'au' ? 1 : -1) * (result.sd || 0);
+                    break;
+                default:
+                    break;
+            }
             result.alt = alt;
             result.az = az;
         }
@@ -232,7 +249,14 @@ export class Position {
         this.orde = 4;
     }
 
-    calc(jd, g) {
+    /**
+     * 
+     * @param {Number} jd
+     * @param {Object} g
+     * @param {String} altMethod
+     * @returns {Object}
+     */
+    calc(jd, g, altMethod = 'a') {
         let deltaT = deltaTJD(jd);
         let jde = jd + deltaT / 86400;
         let {lon, lat, range} = this.func(jde);
@@ -264,9 +288,26 @@ export class Position {
         if (g) {
             result.lha = result.gha - g.lon;
             let {alt, az} = toHorizontal2(result, g);
-            alt -= result.hp * cos(alt);
-            alt += saemundsson(alt);
-            alt += elevation(g.height);
+            switch (altMethod) {
+                case 't':
+                    alt -= result.hp * cos(alt);
+                    alt += elevation(g.height);
+                    break;
+                case 'a':
+                    alt -= result.hp * cos(alt);
+                    alt += saemundsson(alt);
+                    alt += elevation(g.height);
+                    break;
+                case 'au':
+                case 'al':
+                    alt -= result.hp * cos(alt);
+                    alt += saemundsson(alt);
+                    alt += elevation(g.height);
+                    alt += (altMethod == 'au' ? 1 : -1) * (result.sd || 0);
+                    break;
+                default:
+                    break;
+            }
             result.alt = alt;
             result.az = az;
         }
@@ -293,9 +334,10 @@ export class Position {
      * @param {Number} jd1
      * @param {Number} interval
      * @param {Object} g
+     * @param {String} altMethod 
      * @returns {Array}
      */
-    list(jd0, jd1, interval, g) {
+    list(jd0, jd1, interval, g, altMethod = 'a') {
         if (jd1 <= jd0) {
             return [];
         }
@@ -317,7 +359,7 @@ export class Position {
                     sunPoly = this.solar.polynom(T0, 0, 1);
                 }
                 while ((jd <= T0 + 1) && (jd < jd1)) {
-                    let pos = polynom.calc(jd, g);
+                    let pos = polynom.calc(jd, g, altMethod);
                     if (sunPoly) {
                         let sun = sunPoly.calc(jd);
                         pos.elongation = angle.sep(sun, pos);
@@ -337,7 +379,7 @@ export class Position {
             }
         } else {
             while (jd <= jd1) {
-                let pos = this.calc(jd, g);
+                let pos = this.calc(jd, g, altMethod);
                 if (this.solar) {
                     let sun = this.solar.calc(jd);
                     pos.elongation = angle.sep(sun, pos);

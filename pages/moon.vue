@@ -54,27 +54,31 @@
                 </div>
                 <div class="col-md-8 col-12">
                     <lte-card>
-                        <form class="form-horizontal">
-                            <div class="row">
-                                <div class="col-lg-4 col-12">
-                                    <div class="form-group row">
-                                        <label for="sudut" class="col-sm-6 col-form-label">Format Sudut</label>
-                                        <div class="col-sm-6">
-                                            <select class="form-control" id="latitude" v-model="format.sudut">
-                                                <option value="decimal">Desimal</option>
-                                                <option value="dms">Dms</option>
-                                            </select>
-                                        </div>
-                                    </div>
+                        <div class="row">
+                            <div class="col-lg-4 col-12">
+                                <div class="form-group">
+                                    <label for="sudut" >Format Sudut</label>
+                                    <select class="form-control" id="latitude" v-model="format.sudut">
+                                        <option value="decimal">Desimal</option>
+                                        <option value="dms">Dms</option>
+                                    </select>
                                 </div>
-                                <div class="col-lg-4 col-6" v-for="cols in columnsChunk">
-                                    <div class="form-check" v-for="col in cols">
-                                        <input type="checkbox" class="form-check-input" :id="'ck_'+col.key"  v-model="col.value">
-                                        <label class="form-check-label" :for="'ck_'+col.key">{{col.label}}</label>
-                                    </div>
+                                <div class="form-group">
+                                    <label for="altMethod">Altitude</label>
+                                    <select class="form-control" id="altMethod" v-model="format.altMethod" @change="calcList">
+                                        <option value="g">Geosentris</option>
+                                        <option value="t">Toposentris</option>
+                                        <option value="a">Apparent</option>
+                                    </select>
                                 </div>
                             </div>
-                        </form>
+                            <div class="col-lg-4 col-6" v-for="cols in columnsChunk">
+                                <div class="form-check" v-for="col in cols">
+                                    <input type="checkbox" class="form-check-input" :id="'ck_'+col.key"  v-model="col.value">
+                                    <label class="form-check-label" :for="'ck_'+col.key">{{col.label}}</label>
+                                </div>
+                            </div>
+                        </div>
                     </lte-card>
                 </div>
             </div>
@@ -141,6 +145,7 @@
                 },
                 format: {
                     sudut: 'decimal',
+                    altMethod: 'a',
                 },
                 units: units,
                 columns,
@@ -179,7 +184,7 @@
                 let jd2 = (this.model.to || moment().format('YYYY-MM-DD [23:59:59.999]')).toJD();
                 if (jd1 && jd2) {
                     let step = this.model.interval * units[this.model.unit].value / (24 * 3600);
-                    this.rows = moon.list(jd1, jd2, step, this.globe).map(v => {
+                    this.rows = moon.list(jd1, jd2, step, this.globe, this.format.altMethod).map(v => {
                         v.date = Date.fromJD(v.jd);
                         v.lon *= R2D;
                         v.lat *= R2D;
