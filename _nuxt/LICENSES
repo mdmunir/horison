@@ -1,49 +1,19 @@
-/**
- * @copyright 2013 Sonia Keys
- * @copyright 2016 commenthol
- * @license MIT
- * @module moonposition
- */
-
+/*!
+  * vue-router v3.5.3
+  * (c) 2021 Evan You
+  * @license MIT
+  */
 
 /*!
- * vue-client-only v0.0.0-semantic-release
- * (c) 2021-present egoist <0x142857@gmail.com>
+ * Vue.js v2.6.14
+ * (c) 2014-2021 Evan You
  * Released under the MIT License.
  */
 
 /*!
- * vue-no-ssr v1.1.1
- * (c) 2018-present egoist <0x142857@gmail.com>
- * Released under the MIT License.
- */
-
-/**
- * @copyright 2013 Sonia Keys
- * @copyright 2016 commenthol
+ * vuex v3.6.2
+ * (c) 2021 Evan You
  * @license MIT
- * @module deltat
- */
-
-/**
- * @copyright 2013 Sonia Keys
- * @copyright 2016 commenthol
- * @license MIT
- * @module interpolation
- */
-
-/**
- * @copyright 2013 Sonia Keys
- * @copyright 2016 commenthol
- * @license MIT
- * @module julian
- */
-
-/**
- * @copyright 2013 Sonia Keys
- * @copyright 2016 commenthol
- * @license MIT
- * @module sexagesimal
  */
 
 
@@ -181,22 +151,52 @@
  */
 
 
-/*!
-  * vue-router v3.5.3
-  * (c) 2021 Evan You
-  * @license MIT
-  */
+/**
+ * @copyright 2013 Sonia Keys
+ * @copyright 2016 commenthol
+ * @license MIT
+ * @module eqtime
+ */
+
 
 /*!
- * Vue.js v2.6.14
- * (c) 2014-2021 Evan You
+ * vue-client-only v0.0.0-semantic-release
+ * (c) 2021-present egoist <0x142857@gmail.com>
  * Released under the MIT License.
  */
 
 /*!
- * vuex v3.6.2
- * (c) 2021 Evan You
+ * vue-no-ssr v1.1.1
+ * (c) 2018-present egoist <0x142857@gmail.com>
+ * Released under the MIT License.
+ */
+
+/**
+ * @copyright 2013 Sonia Keys
+ * @copyright 2016 commenthol
  * @license MIT
+ * @module deltat
+ */
+
+/**
+ * @copyright 2013 Sonia Keys
+ * @copyright 2016 commenthol
+ * @license MIT
+ * @module interpolation
+ */
+
+/**
+ * @copyright 2013 Sonia Keys
+ * @copyright 2016 commenthol
+ * @license MIT
+ * @module julian
+ */
+
+/**
+ * @copyright 2013 Sonia Keys
+ * @copyright 2016 commenthol
+ * @license MIT
+ * @module sexagesimal
  */
 
 
@@ -204,5 +204,5 @@
  * @copyright 2013 Sonia Keys
  * @copyright 2016 commenthol
  * @license MIT
- * @module eqtime
+ * @module moonposition
  */
