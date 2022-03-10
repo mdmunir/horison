@@ -60,6 +60,27 @@ Number.prototype.asTime = function (fixed = 2, compact = false) {
     return hms(this, 3, fixed, compact);
 }
 
+Number.prototype.toDate = function () {
+    return Date.fromJD(this);
+}
+
+const ARABS = ['٠',
+    '١',
+    '٢',
+    '٣',
+    '٤',
+    '٥',
+    '٦',
+    '٧',
+    '٨',
+    '٩'
+];
+
+Number.prototype.toArab = function (fixed) {
+    let s = fixed ? this.toFixed(fixed) : this.toString();
+    return s.replace(/\d/g, m => ARABS[parseInt(m)]);
+}
+
 Number.prototype.toScientific = function (digit, f) {
     let n = Math.log10(Math.abs(this));
     if (n > digit) {

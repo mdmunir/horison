@@ -35,7 +35,22 @@ export function currentMonth(d = 0) {
     return [y, m + 1];
 }
 
+const hilalCaches = {};
+
 export class Hilal {
+
+    /**
+     * 
+     * @param {Number} y 
+     * @param {Number} m 
+     */
+    static create(y, m) {
+        let k = 12 * y + m - 17050;
+        if (hilalCaches[k]) {
+            return hilalCaches[k];
+        }
+        return hilalCaches[k] = new Hilal(y, m)
+    }
     /**
      * 
      * @param {Number} y 
@@ -43,33 +58,33 @@ export class Hilal {
      */
     constructor(y, m) {
         this.k = 12 * y + m - 17050;
-        
+
         this.y = this.k / 12.3685 + 2000;
         this.deltaT = horison.deltaT(this.y);
-        
+
         let jde = moonphase.newMoon(this.y);
         this.meeusConjunction = jde - this.deltaT / 86400;
         this.T0 = floor(jde);
         let jam = floor((jde - this.T0) * 24) / 24;
         this.H0 = this.T0 + jam;
-        
+
         const BEGIN = jam - 1.25;
         const END = jam + 2;
         this.begin = BEGIN + this.T0;
         this.end = END + this.T0;
-        
+
         const solar = new position.Solar(true, 4);
         const moon = new position.Moon(true, 4);
-        
+
         this.sunPolynom = solar.polynom(this.T0, BEGIN, END);
         this.moonPolynom = moon.polynom(this.T0, BEGIN, END);
-        
+
         const [tEc, tEq] = this.calcConjunction(this.sunPolynom.POLYNOM, this.moonPolynom.POLYNOM);
-        
+
         this.conjunction = tEc + this.T0;
         this.equatorConjunction = tEq + this.T0;
     }
-    
+
     calcConjunction(sun, moon) {
         const DELTA = 29.5 / (2 * PI);
         let t;
@@ -84,7 +99,7 @@ export class Hilal {
                 break;
             }
         }
-        
+
         // equator
         for (i = 0; i < 20; i++) {
             selisih = base.horner(tEq, moon.Ra) - base.horner(tEq, sun.Ra);
@@ -95,10 +110,10 @@ export class Hilal {
                 break;
             }
         }
-        
+
         return [tEc, tEq];
     }
-    
+
     info() {
         const {deltaT, meeusConjunction, conjunction, equatorConjunction, T0, begin, end} = this;
         return {deltaT, meeusConjunction, conjunction, equatorConjunction, T0, begin, end,
@@ -106,7 +121,7 @@ export class Hilal {
             moons: this.moonPolynom.POLYNOM,
         };
     }
-    
+
     /**
      * 
      * @param {Object} g globe coordinate
@@ -119,10 +134,10 @@ export class Hilal {
         // sun set.
         let alt = -50 / 60 * D2R;
         let sunSet = this.sunPolynom.rise(jd, g, alt, 1);
-        
+
         const sunPos = this.sunPolynom.calc(sunSet, g, altMethod);
         const moonPos = this.moonPolynom.calc(sunSet, g, altMethod);
-        
+
         alt = -34 / 60 * D2R + moonPos.hp - moonPos.sd; // altitude terbenam bulan
         let moonSet = this.moonPolynom.rise(sunSet - 2 / 24, g, alt, 1);
         const result = {
@@ -130,6 +145,7 @@ export class Hilal {
             age: sunSet - this.conjunction,
             duration: moonSet - sunSet,
             limb: base.limb(moonPos, sunPos),
+            alt:moonPos.alt,
         };
         result.elongation = angle.sep(sunPos, moonPos);
         const [sψ, cψ] = base.sincos(result.elongation);
@@ -139,7 +155,7 @@ export class Hilal {
         }
         result.fraction = (1 + cos(i)) / 2;
         result.phase = base.pmod(moonPos.lon - sunPos.lon, 2 * PI);
-        
+
         return result;
     }
 }
@@ -150,7 +166,7 @@ export class Criteria {
         this.elongation = (elongation || 0) * D2R;
         this.age = (age || 0) / 24.0;
     }
-    
+
     test(info) {
         let valid = info.alt >= this.alt && info.elongation >= this.elongation;
         return valid || (this.age > 0 && info.age > this.age);
@@ -161,7 +177,33 @@ export class Hijriah {
     constructor(criteria) {
         this.criteria = criteria || new Criteria();
     }
-    
+
+    calcCurrent(g) {
+        let [y, m] = currentMonth();
+        let k = 12 * y + m;
+        const rows = this.calc(g, k - 1, k);
+        return {
+            year: rows[1].y,
+            month: rows[1].m,
+            jd: Math.floor(rows[1].jd),
+            count: rows[1].days,
+            prevCount: rows[0].days,
+        }
+    }
+
+    calcMonth(g, y, m) {
+        let [y_, m_] = currentMonth();
+        let k = 12 * (y || y_) + (m || m_);
+        const rows = this.calc(g, k - 1, k);
+        return {
+            year: rows[1].y,
+            month: rows[1].m,
+            jd: Math.floor(rows[1].jd),
+            count: rows[1].days,
+            prevCount: rows[0].days,
+        }
+    }
+
     /**
      * 
      * @param {Object} g geograpic coordinat
@@ -178,19 +220,19 @@ export class Hijriah {
         let hilal, info, result = new Array(k2 - k1), lastNewMoonJD;
         let y = floor((k2 - 1) / 12);
         let m = (k2 - 1) % 12 + 1;
-        hilal = new Hilal(y, m);
+        hilal = Hilal.create(y, m);
         info = hilal.calc(g);
         lastNewMoonJD = info.sunSet;
         if (!criteria.test(info)) {
             lastNewMoonJD += 1;
         }
-        
+
         for (let k = k2 - 1; k >= k1; k--) {
             y = floor((k - 1) / 12);
             m = (k - 1) % 12 + 1;
             hilal = new Hilal(y, m);
             info = hilal.calc(g);
-            
+
             let newMoonJD = info.sunSet;
             if (!criteria.test(info)) {
                 newMoonJD += 1;
@@ -203,9 +245,9 @@ export class Hijriah {
         }
         return result;
     }
-    
+
     toJD(y, m = 1, d = 1) {
-        
+
     }
 }
 
@@ -222,7 +264,7 @@ export class Aritmatic {
         }
         this.years = years;
     }
-    
+
     toJD(y, m = 1, d = 1) {
         let y30 = floor((y - 1) / 30);
         let jd = y30 * 10631;
@@ -230,7 +272,7 @@ export class Aritmatic {
         jd += this.years[y - 1].day;
         return this.JD0 + jd + 30 * (m - 1) - (floor((m - 1) / 2)) + d;
     }
-    
+
     fromJD(jd) {
         let day = floor(jd) - this.JD0;
         if (day < 0) {
@@ -254,7 +296,7 @@ export class Aritmatic {
         }
         return [y, m + 1, day]
     }
-    
+
     calc(k1, k2) {
         let k, result = [];
         if (!k2 || k2 < k1) {

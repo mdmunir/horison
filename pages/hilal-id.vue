@@ -114,7 +114,7 @@
             },
             calcList() {
                 const {y, m, d, altMethod} = this.model;
-                const hilal = new Hilal(y, m);
+                const hilal = Hilal.create(y, m);
                 const {conjunction, meeusConjunction, equatorConjunction} = hilal.info();
                 this.info.conjunction = Date.fromJD(conjunction);
                 this.info.meeusConjunction = Date.fromJD(meeusConjunction);

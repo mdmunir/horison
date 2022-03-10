@@ -11,6 +11,11 @@
                 </div>
             </div>
         </div>
+        <div class="row">
+            <div class="col-12">
+                <a-hijriah v-bind="hijriah"></a-hijriah>
+            </div>
+        </div>
     </lte-content>
 </template>
 
@@ -48,6 +53,17 @@
             },
             latLon() {
                 return Globe.fromLoc(this.$store.state.location).toString();
+            },
+            hijriah() {
+                const loc = this.$store.state.location;
+                const criteria = this.$store.state.criteria;
+                const info = {
+                    lon: loc.lon,
+                    lat: loc.lat,
+                    alt: criteria.alt,
+                    elongation: criteria.elongation,
+                };
+                return info;
             }
         },
     }

@@ -1,16 +1,23 @@
 <template>
     <lte-content title="Setting">
         <lte-card title="Lokasi" buttons="collapse">
-            <a-setting-location v-model="location" ref="loc" @modified="locModified=$event"></a-setting-location>
+            <a-setting-location v-model="location" ref="loc" @modified="changeModified('loc',$event)"></a-setting-location>
             <template #footer>
-                <button type="button" class="btn" @click="saveLoc" :class="locBtnClass">Simpan</button>
+                <button type="button" class="btn" @click="save('loc')" :class="btnClass('loc')">Simpan</button>
             </template>
         </lte-card>
 
         <lte-card title="Waktu Shalat" buttons="collapse">
-            <a-setting-prayer v-model="prayer" ref="prayer" @modified="prayerModified=$event"></a-setting-prayer>
+            <a-setting-prayer v-model="prayer" ref="prayer" @modified="changeModified('prayer',$event)"></a-setting-prayer>
             <template #footer>
-                <button type="button" class="btn" @click='savePrayer' :class="prayerBtnClass">Simpan</button>
+                <button type="button" class="btn" @click="save('prayer')" :class="btnClass('prayer')">Simpan</button>
+            </template>
+        </lte-card>
+
+        <lte-card title="Kriteria Hilal" buttons="collapse">
+            <a-setting-criteria v-model="criteria" ref="criteria" @modified="changeModified('criteria',$event)"></a-setting-criteria>
+            <template #footer>
+                <button type="button" class="btn" @click="save('criteria')" :class="btnClass('criteria')">Simpan</button>
             </template>
         </lte-card>
     </lte-content>
@@ -24,27 +31,22 @@
         },
         data() {
             return {
-                locModified: false,
-                prayerModified: false,
-                location:{},
+                isModified:{},
+                location: {},
                 prayer: {},
+                criteria: {},
             }
         },
         methods: {
-            saveLoc() {
-                this.$refs.loc.save();
+            save(part){
+                this.$refs[part].save();
             },
-            savePrayer() {
-                this.$refs.prayer.save();
+            btnClass(part) {
+                return (this.isModified[part]) ? 'btn-primary' : 'btn-default';
             },
+            changeModified(part, e){
+                this.isModified[part] = e;
+            }
         },
-        computed: {
-            locBtnClass() {
-                return (this.locModified) ? 'btn-primary' : 'btn-default';
-            },
-            prayerBtnClass() {
-                return (this.prayerModified) ? 'btn-primary' : 'btn-default';
-            },
-        }
     }
 </script>
