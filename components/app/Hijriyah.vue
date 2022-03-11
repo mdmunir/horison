@@ -2,10 +2,10 @@
     <table class="table table-bordered" style="text-align: center;">
         <thead>
             <tr>
-                <th colspan="7">
-                    <h4>{{info.name}}</h4>
+                <td colspan="7">
+                    <div style="font-size: 1.8em;">{{info.name}}</div>
                     <span style="font-size: 0.9em;">{{info.masehi}}</span>
-                </th>
+                </td>
             </tr>
             <tr>
                 <th v-for="d in dayNames">
@@ -18,7 +18,7 @@
             <tr v-for="row in info.matrix">
                 <td v-for="cell in row" :class="{'inactive': !cell.isActive}">
                     <span style="font-size: 0.8em;">{{cell.mDay}}</span>
-                    <h2>{{cell.dArab}}</h2>
+                    <div style="font-size: 1.7em;">{{cell.dArab}}</div>
                     <span style="font-size: 0.6em;">{{cell.pekan}}</span>
                 </td>
             </tr>
@@ -32,10 +32,14 @@
 </template>
 <style>
     .table th, .table td{
-        padding: 1px;
+        padding: 0px;
     }
     .table td.inactive{
         opacity: 0.25;
+    }
+    td div{
+        margin-bottom: -0.3em;
+        margin-top: -0.3em;
     }
 </style>
 <script>

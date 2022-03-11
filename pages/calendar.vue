@@ -23,6 +23,7 @@
 <script>
     import {currentMonth} from '@/libs/hijriyah';
 
+    const FORMAT = {note: false};
     export default {
         head: {
             title: 'Kalender Hijriyah'
@@ -33,9 +34,7 @@
                 model: {
                     y: y,
                 },
-                format: {
-                    note: true,
-                },
+                format: FORMAT,
             }
         },
         watch: {
