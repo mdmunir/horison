@@ -85,7 +85,18 @@
         props: ['value'],
         data() {
             return {
-                model: Object.assign({}, this.$store.state.prayer),
+                model: Object.assign({
+                    alt_subuh: -20,
+                    alt_isya: -18,
+                    alt_dhuha: 4.5,
+                    subuh: 2,
+                    dhuha: 2,
+                    dzuhur: 2,
+                    ashar: 2,
+                    maghrib: 2,
+                    isya: 2,
+                    terbit: -2,
+                }, this.$store.state.prayer),
                 modified: false,
             }
         },

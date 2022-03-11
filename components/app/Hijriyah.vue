@@ -55,23 +55,11 @@
             month: {
                 type: Number,
             },
-            alt: {
-                type: Number,
-                default: 0,
+            criteria: {
+                type: Object,
             },
-            elongation: {
-                type: Number,
-                default: 0,
-            },
-            age: {
-                type: Number,
-                default: 0,
-            },
-            lat: {
-                type: Number,
-            },
-            lon: {
-                type: Number,
+            loc: {
+                type: Object,
             },
         },
         data() {
@@ -81,8 +69,8 @@
         },
         computed: {
             info() {
-                const criteria = new Criteria(this.alt, this.elongation, this.age);
-                const globe = Globe.fromLoc({lon: this.lon, lat: this.lat});
+                const criteria = new Criteria(this.criteria || {});
+                const globe = Globe.fromLoc(this.loc || {});
                 const h = new Hijriah(criteria);
                 const info = h.calcMonth(globe, this.year, this.month);
                 let jd = Math.floor(info.jd + 1);
@@ -104,7 +92,7 @@
                         }
 
                         let date = (x - dow + jd).toDate();
-                        let pekan = (x - dow + jd) % 5;
+                        let pekan = (x - dow + jd + 3) % 5;
                         row.push({
                             d, date, dd,
                             dArab: dd.toArab(),

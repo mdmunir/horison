@@ -31,20 +31,24 @@
         },
         data() {
             return {
-                isModified:{},
+                isModified: {
+                    loc: false,
+                    prayer: false,
+                    criteria: false,
+                },
                 location: {},
                 prayer: {},
                 criteria: {},
             }
         },
         methods: {
-            save(part){
+            save(part) {
                 this.$refs[part].save();
             },
             btnClass(part) {
                 return (this.isModified[part]) ? 'btn-primary' : 'btn-default';
             },
-            changeModified(part, e){
+            changeModified(part, e) {
                 this.isModified[part] = e;
             }
         },

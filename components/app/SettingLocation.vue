@@ -53,7 +53,15 @@
         props: ['value'],
         data() {
             return {
-                model: Object.assign({}, this.$store.state.location),
+                model: Object.assign({
+                    id: 163,
+                    name: '',
+                    lat: -6.170167,
+                    lon: 106.831,
+                    timezone: 'Asia/Jakarta',
+                    offset: 420,
+                    height: 10,
+                }, this.$store.state.location),
                 locations: locations,
                 timezones: timezones,
                 modified: false,

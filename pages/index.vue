@@ -13,7 +13,7 @@
         </div>
         <div class="row">
             <div class="col-12">
-                <a-hijriah v-bind="hijriah"></a-hijriah>
+                <a-hijriyah v-bind="hijriyah"></a-hijriyah>
             </div>
         </div>
     </lte-content>
@@ -54,14 +54,12 @@
             latLon() {
                 return Globe.fromLoc(this.$store.state.location).toString();
             },
-            hijriah() {
-                const loc = this.$store.state.location;
-                const criteria = this.$store.state.criteria;
+            hijriyah() {
+                const loc = this.$store.state.location || {};
+                const criteria = this.$store.state.criteria || {};
                 const info = {
-                    lon: loc.lon,
-                    lat: loc.lat,
-                    alt: criteria.alt,
-                    elongation: criteria.elongation,
+                    loc: {...loc},
+                    criteria: {...criteria},
                 };
                 return info;
             }

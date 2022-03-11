@@ -145,7 +145,7 @@ export class Hilal {
             age: sunSet - this.conjunction,
             duration: moonSet - sunSet,
             limb: base.limb(moonPos, sunPos),
-            alt:moonPos.alt,
+            alt: moonPos.alt,
         };
         result.elongation = angle.sep(sunPos, moonPos);
         const [sψ, cψ] = base.sincos(result.elongation);
@@ -162,6 +162,11 @@ export class Hilal {
 
 export class Criteria {
     constructor(alt, elongation, age) {
+        if (typeof alt === 'object') {
+            age = alt.age;
+            elongation = alt.elongation;
+            alt = alt.alt;
+        }
         this.alt = (alt || 0) * D2R;
         this.elongation = (elongation || 0) * D2R;
         this.age = (age || 0) / 24.0;

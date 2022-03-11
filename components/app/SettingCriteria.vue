@@ -20,7 +20,7 @@
                     <label for="age" class="col-4 col-form-label">Umur Bulan</label>
                     <div class="col-8">
                         <input type="number" step="any" class="form-control" id="age"
-                               placeholder="Umur bulan" v-model.number="model.age">
+                               placeholder="" v-model.number="model.age">
                     </div>
                 </div>
             </div>
@@ -33,7 +33,11 @@
         props: ['value'],
         data() {
             return {
-                model: Object.assign({}, this.$store.state.criteria),
+                model: Object.assign({
+                    alt: 2,
+                    elongation: 3,
+                    age: 8,
+                }, this.$store.state.criteria),
                 modified: false,
             }
         },

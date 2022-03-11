@@ -1,5 +1,5 @@
 <template>
-    <lte-content title="Kalender Hijriah">
+    <lte-content title="Kalender Hijriyah">
         <lte-card>
             <template #tools>
                 <ul class="pagination pagination-sm float-left">
@@ -10,7 +10,7 @@
             </template>
             <div class="row">
                 <div class="col-12" v-for="info in months">
-                    <a-hijriah v-bind="info"></a-hijriah>
+                    <a-hijriyah v-bind="info"></a-hijriyah>
                 </div>
             </div>
         </lte-card>
@@ -22,7 +22,7 @@
 
     export default {
         head: {
-            title: 'Kalender'
+            title: 'Kalender Hijriyah'
         },
         data() {
             const [y, ] = currentMonth();
@@ -50,15 +50,15 @@
             },
             calcList() {
                 const {y} = this.model;
-                const {lon, lat} = this.$store.state.location;
-                const {alt, elongation, age} = this.$store.state.criteria;
+                const loc = this.$store.state.location || {};
+                const criteria = this.$store.state.criteria || {};
                 const result = [];
                 for (let i = 1; i <= 12; i++) {
                     result.push({
                         year: y,
                         month: i,
-                        lon, lat,
-                        alt, elongation, age
+                        loc:{...loc},
+                        criteria:{...criteria},
                     });
                 }
                 this.months = result;
