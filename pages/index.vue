@@ -13,7 +13,10 @@
         </div>
         <div class="row">
             <div class="col-12">
-                <a-hijriyah v-bind="hijriyah"></a-hijriyah>
+                <lte-card>
+                    <a-hijriyah v-bind="hijriyah"></a-hijriyah>
+                </lte-card>
+                
             </div>
         </div>
     </lte-content>

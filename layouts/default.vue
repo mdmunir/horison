@@ -20,6 +20,8 @@
                     }
                 });
             }
+
+            BroadcastChannel.myListen(this.$store);
         },
     }
 </script>

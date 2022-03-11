@@ -76,6 +76,15 @@
                                placeholder="Altitude dhuha" v-model.number="model.alt_dhuha">
                     </div>
                 </div>
+                <div class="form-group row">
+                    <label for="alt_ashar" class="col-4 col-form-label">Waktu Ashar</label>
+                    <div class="col-8">
+                        <select class="form-control" id="alt_ashar" v-model="model.alt_ashar">
+                            <option :value="1">Jumhur</option>
+                            <option :value="2">Hanafy</option>
+                        </select>
+                    </div>
+                </div>
             </div>
         </div>
     </form>
@@ -89,6 +98,7 @@
                     alt_subuh: -20,
                     alt_isya: -18,
                     alt_dhuha: 4.5,
+                    alt_ashar: 1,
                     subuh: 2,
                     dhuha: 2,
                     dzuhur: 2,

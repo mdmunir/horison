@@ -188,11 +188,8 @@ export class Hijriah {
         let k = 12 * y + m;
         const rows = this.calc(g, k - 1, k);
         return {
-            year: rows[1].y,
-            month: rows[1].m,
-            jd: Math.floor(rows[1].jd),
-            count: rows[1].days,
-            prevCount: rows[0].days,
+            ...rows[1],
+            prevCount: rows[0].count,
         }
     }
 
@@ -201,11 +198,8 @@ export class Hijriah {
         let k = 12 * (y || y_) + (m || m_);
         const rows = this.calc(g, k - 1, k);
         return {
-            year: rows[1].y,
-            month: rows[1].m,
-            jd: Math.floor(rows[1].jd),
-            count: rows[1].days,
-            prevCount: rows[0].days,
+            ...rows[1],
+            prevCount: rows[0].count,
         }
     }
 
@@ -245,14 +239,18 @@ export class Hijriah {
             let days = floor(lastNewMoonJD - newMoonJD + 0.5);
             lastNewMoonJD = newMoonJD;
             result[k - k1] = {
-                y, m, jd: newMoonJD, days, info,
+                year: y, month: m,
+                jd: Math.floor(newMoonJD),
+                count: days,
+                sunSet: info.sunSet,
+                moonSet: info.moonSet,
+                alt: info.alt,
+                elongation: info.elongation,
+                age: info.age,
+                conjunction:hilal.conjunction,
             }
         }
         return result;
-    }
-
-    toJD(y, m = 1, d = 1) {
-
     }
 }
 

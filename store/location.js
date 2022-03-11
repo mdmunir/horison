@@ -14,5 +14,10 @@ export const mutations = {
     change(state, loc) {
         Object.assign(state, loc);
         localStorage.setItem('horison/location', JSON.stringify(state));
+
+        BroadcastChannel.myRefresh();
+    },
+    refresh(state) {
+        Object.assign(state, JSON.parse(localStorage.getItem('horison/location')) || {});
     }
 }

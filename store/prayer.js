@@ -3,6 +3,7 @@ export const state = () => {
         alt_subuh: -20,
         alt_isya: -18,
         alt_dhuha: 4.5,
+        alt_ashar: 1,
         subuh: 2,
         dhuha: 2,
         dzuhur: 2,
@@ -17,5 +18,10 @@ export const mutations = {
     change(state, config) {
         Object.assign(state, config);
         localStorage.setItem('horison/prayer', JSON.stringify(state));
+
+        BroadcastChannel.myRefresh();
+    },
+    refresh(state) {
+        Object.assign(state, JSON.parse(localStorage.getItem('horison/prayer')) || {});
     }
 }

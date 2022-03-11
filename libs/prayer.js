@@ -95,8 +95,9 @@ function calcPrayer(y, m, d, loc, c) {
     list.push({name: 'dzuhur', jd});
 
     // ashar
+    let alt_ashar = c.alt_ashar || 1;
     dec = calcDec(jd); // alt dzuhur  
-    H0 = PI / 2 - atan(1 + abs(tan(dec - loc.lat * D2R)));
+    H0 = PI / 2 - atan(alt_ashar + abs(tan(dec - loc.lat * D2R)));
     jd = calcH(JDL, H0, loc, 1);
     list.push({name: 'ashar', jd});
 

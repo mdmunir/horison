@@ -16,19 +16,32 @@
         </thead>
         <tbody>
             <tr v-for="row in info.matrix">
-                <td v-for="cell in row" :style="{'opacity': cell.isActive ? 1:0.4}">
+                <td v-for="cell in row" :class="{'inactive': !cell.isActive}">
                     <span style="font-size: 0.8em;">{{cell.mDay}}</span>
                     <h2>{{cell.dArab}}</h2>
                     <span style="font-size: 0.6em;">{{cell.pekan}}</span>
                 </td>
             </tr>
         </tbody>
+        <tfoot v-if="showNote">
+            <tr>
+                <td colspan="7" v-html="info.note" style="text-align: left;font-size: 0.8em;"></td>
+            </tr>
+        </tfoot>
     </table>
 </template>
+<style>
+    .table th, .table td{
+        padding: 1px;
+    }
+    .table td.inactive{
+        opacity: 0.25;
+    }
+</style>
 <script>
 
     import {Hijriah, Criteria, MONTHS} from '@/libs/hijriyah';
-    import {Globe} from '@/libs/horison';
+    import {Globe, R2D} from '@/libs/horison';
 
     const DAYS = [
         ['A', 'AHAD'],
@@ -61,6 +74,10 @@
             loc: {
                 type: Object,
             },
+            showNote: {
+                type: Boolean,
+                default: false,
+            }
         },
         data() {
             return{
@@ -104,10 +121,18 @@
                     matrix.push(row);
                 }
                 let masehi = `${moment(jd.toDate()).format('MMMM YYYY')} - ${moment((jd + info.count).toDate()).format('MMMM YYYY')}`;
+                let offset = this.loc.offset || 420;
+                let sConjuction = moment(info.conjunction.toDate()).utcOffset(offset).format('dddd, D MMMM YYYY [pukul] HH:mm:ss');
+                let sSunset = moment(info.sunSet.toDate()).utcOffset(offset).format('D MMM YYYY HH:mm:ss');
+                let sAge = info.age > 0 ? (info.age * 24).hms(0, true) : '-';
+                let note = `Konjungsi: <b>${sConjuction}</b>.
+Pada saat Maghrib tanggal <b>${sSunset}</b>, altitude bulan = <b>${(info.alt * R2D).toFixed(4)}°</b>,
+elongasi = <b>${(info.elongation * R2D).toFixed(4)}°</b> dan umur bulan = <b>${sAge}</b>.`;
                 return{
                     name: `${MONTHS[info.month - 1].name} ${info.year.toArab()}`,
                     masehi: masehi,
                     matrix: matrix,
+                    note,
                 }
             }
         }

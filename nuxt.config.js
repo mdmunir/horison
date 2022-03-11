@@ -34,6 +34,7 @@ const m = {
             {src: `${DEPLOY_PATH}plugins/bootstrap/js/bootstrap.bundle.min.js`, body: true},
             {src: `${DEPLOY_PATH}plugins/select2/js/select2.full.min.js`, body: true},
             {src: `${DEPLOY_PATH}plugins/moment/moment.min.js`, body: true},
+            {src: `${DEPLOY_PATH}plugins/moment/locales.min.js`, body: true},
             {src: `${DEPLOY_PATH}dist/js/adminlte.js`, body: true}
         ],
         bodyAttrs: {
@@ -48,6 +49,7 @@ const m = {
     // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
     plugins: [
         '~/libs/format.js',
+        '~/libs/message.js',
         //'@/plugins/sw-update.js',
     ],
 
@@ -86,7 +88,9 @@ const m = {
             start_url: DEPLOY_PATH,
         },
         workbox: {
-            importScripts: [`${DEPLOY_PATH}dist/precache.js`],
+            importScripts: [
+                `${DEPLOY_PATH}dist/precache.js`,
+            ],
             runtimeCaching: [
                 {
                     urlPattern: 'https://fonts.googleapis.com/.*',
