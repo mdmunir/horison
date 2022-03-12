@@ -3,6 +3,8 @@ export const state = () => {
         alt: 2,
         elongation: 3,
         age: 8,
+        method_elongation: 'g',
+        method_alt: 'a',
     }, JSON.parse(localStorage.getItem('horison/criteria')) || {});
 }
 

@@ -1,7 +1,7 @@
 import base from 'astronomia/src/base';
 import moonphase from 'astronomia/src/moonphase';
 import angle from 'astronomia/src/angle';
-import horison from './horison';
+import {toHorizontal2, horizontalSep, deltaT} from './horison';
 import position from './position';
 
 const {PI, abs, atan, cos, floor} = Math;
@@ -60,7 +60,7 @@ export class Hilal {
         this.k = 12 * y + m - 17050;
 
         this.y = this.k / 12.3685 + 2000;
-        this.deltaT = horison.deltaT(this.y);
+        this.deltaT = deltaT(this.y);
 
         let jde = moonphase.newMoon(this.y);
         this.meeusConjunction = jde - this.deltaT / 86400;
@@ -126,17 +126,17 @@ export class Hilal {
      * 
      * @param {Object} g globe coordinate
      * @param {Number} day 
-     * @param {String} altMethod 
+     * @param {Object} method 
      * @return {Object}
      */
-    calc(g, day = 0, altMethod = 'a') {
+    calc(g, day = 0, method) {
         let jd = this.H0 + day;
         // sun set.
         let alt = -50 / 60 * D2R;
         let sunSet = this.sunPolynom.rise(jd, g, alt, 1);
 
-        const sunPos = this.sunPolynom.calc(sunSet, g, altMethod);
-        const moonPos = this.moonPolynom.calc(sunSet, g, altMethod);
+        const sunPos = this.sunPolynom.calc(sunSet, g, method);
+        const moonPos = this.moonPolynom.calc(sunSet, g, method);
 
         alt = -34 / 60 * D2R + moonPos.hp - moonPos.sd; // altitude terbenam bulan
         let moonSet = this.moonPolynom.rise(sunSet - 2 / 24, g, alt, 1);
@@ -147,7 +147,18 @@ export class Hilal {
             limb: base.limb(moonPos, sunPos),
             alt: moonPos.alt,
         };
-        result.elongation = angle.sep(sunPos, moonPos);
+
+        if (g && method.elongation == 't') {
+            const p1 = toHorizontal2(moonPos, g);
+            const p2 = toHorizontal2(sunPos, g);
+
+            p1.alt -= (moonPos.hp || 0) * cos(p1.alt);
+            p2.alt -= (sunPos.hp || 0) * cos(p2.alt);
+            result.elongation = horizontalSep(p1, p2);
+        } else {
+            result.elongation = angle.sep(sunPos, moonPos);
+        }
+
         const [sψ, cψ] = base.sincos(result.elongation);
         let i = atan(sunPos.range * sψ / (moonPos.range - sunPos.range * cψ));
         if (i < 0) {
@@ -161,15 +172,19 @@ export class Hilal {
 }
 
 export class Criteria {
-    constructor(alt, elongation, age) {
+    constructor(alt, elongation, age, method_alt, method_elongation) {
         if (typeof alt === 'object') {
             age = alt.age;
             elongation = alt.elongation;
             alt = alt.alt;
+            method_alt = alt.method_alt;
+            method_elongation = alt.method_elongation;
         }
         this.alt = (alt || 0) * D2R;
         this.elongation = (elongation || 0) * D2R;
         this.age = (age || 0) / 24.0;
+        this.method_elongation = method_elongation || 'g';
+        this.method_alt = method_alt || 'a';
     }
 
     test(info) {
@@ -216,11 +231,15 @@ export class Hijriah {
             k2++;
         }
         const criteria = this.criteria;
+        const method = {
+            alt: criteria.method_alt || 'a',
+            elongation: criteria.method_elongation || 'g',
+        };
         let hilal, info, result = new Array(k2 - k1), lastNewMoonJD;
         let y = floor((k2 - 1) / 12);
         let m = (k2 - 1) % 12 + 1;
         hilal = Hilal.create(y, m);
-        info = hilal.calc(g);
+        info = hilal.calc(g, 0, method);
         lastNewMoonJD = info.sunSet;
         if (!criteria.test(info)) {
             lastNewMoonJD += 1;
@@ -230,7 +249,7 @@ export class Hijriah {
             y = floor((k - 1) / 12);
             m = (k - 1) % 12 + 1;
             hilal = new Hilal(y, m);
-            info = hilal.calc(g);
+            info = hilal.calc(g, 0, method);
 
             let newMoonJD = info.sunSet;
             if (!criteria.test(info)) {
@@ -247,7 +266,7 @@ export class Hijriah {
                 alt: info.alt,
                 elongation: info.elongation,
                 age: info.age,
-                conjunction:hilal.conjunction,
+                conjunction: hilal.conjunction,
             }
         }
         return result;

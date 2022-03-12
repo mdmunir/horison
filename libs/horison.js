@@ -14,7 +14,7 @@ import sidereal from 'astronomia/src/sidereal';
 import planetposition from 'astronomia/src/planetposition';
 import elp from 'astronomia/src/elp';
 
-const {cos, sin, tan, atan, atan2, asin, acos, abs, floor, PI} = Math;
+const {cos, sin, tan, atan, atan2, asin, acos, abs, floor, hypot, sqrt, PI} = Math;
 
 export const D2R = PI / 180;
 export const R2D = 180 / PI;
@@ -256,6 +256,18 @@ export function toHorizontal2(pos, g) {
     return {alt, az};
 }
 
+export function horizontalSep (c1, c2) {
+  const [sind1, cosd1] = base.sincos(c1.alt)
+  const [sind2, cosd2] = base.sincos(c2.alt)
+  const cd = sind1 * sind2 + cosd1 * cosd2 * cos(c1.az - c2.az) // (17.1) p. 109
+  if (cd < base.CosSmallAngle) {
+    return acos(cd)
+  } else {
+    const cosd = cos((c2.alt + c1.alt) / 2) // average dec of two bodies
+    return hypot((c2.az - c1.az) * cosd, c2.alt - c1.alt) // (17.2) p. 109
+  }
+}
+
 export class Globe {
     constructor(lon, lat, height) {
         let o = {};
@@ -297,4 +309,7 @@ export default {
     SEC2RAD,
     RAD2SEC,
     Globe,
+    horizontalSep,
+    toHorizontal,
+    toHorizontal2,
 }

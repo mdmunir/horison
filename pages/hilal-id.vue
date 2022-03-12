@@ -22,12 +22,21 @@
                         <div class="form-group row">
                             <label for="altitude" class="col-4 col-form-label">Altitude</label>
                             <div class="col-8">
-                                <select class="form-control" id="altitude" v-model="model.altMethod" @change="calcList">
+                                <select class="form-control" id="altitude" v-model="method.alt" @change="calcList">
                                     <option value="g">Geosentris</option>
                                     <option value="t">Toposentris</option>
                                     <option value="a">Apparent</option>
                                     <option value="au">Apparent Upper</option>
                                     <option value="al">Apparent Lower</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="elongation" class="col-4 col-form-label">Elongation</label>
+                            <div class="col-8">
+                                <select class="form-control" id="elongation" v-model="method.elongation" @change="calcList">
+                                    <option value="g">Geosentris</option>
+                                    <option value="t">Toposentris</option>
                                 </select>
                             </div>
                         </div>
@@ -46,6 +55,10 @@
     import base from 'astronomia/src/base';
 
     const {floor} = Math;
+    const METHOD = {
+        alt: 'a',
+        elongation: 'g'
+    };
 
     const columns = [
         {key: 'name', label: 'Lokasi'},
@@ -75,8 +88,8 @@
                     m: m,
                     y: y,
                     d: 0,
-                    altMethod:'a',
                 },
+                method: METHOD,
                 columns: columns,
                 rows: [],
                 info: {},
@@ -113,7 +126,8 @@
                 }
             },
             calcList() {
-                const {y, m, d, altMethod} = this.model;
+                const {y, m, d} = this.model;
+                const method = this.method || {};
                 const hilal = Hilal.create(y, m);
                 const {conjunction, meeusConjunction, equatorConjunction} = hilal.info();
                 this.info.conjunction = Date.fromJD(conjunction);
@@ -125,7 +139,7 @@
                 locations.forEach(loc => {
                     let offset = parseFloat(loc.zone) * 60;
                     const g = Globe.fromLoc(loc);
-                    const info = hilal.calc(g, d, altMethod);
+                    const info = hilal.calc(g, d, method);
                     const sunSet = Date.fromJD(info.sunSet);
                     const row = {
                         name: loc.name, lat: loc.lat, lon: loc.lon,

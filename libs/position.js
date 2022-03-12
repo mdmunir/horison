@@ -6,7 +6,7 @@ import {saemundsson} from 'astronomia/src/refraction';
 
 import solar from './solar';
 import moon from './moon';
-import {obliquity, toEquatorial, toHorizontal, toHorizontal2, deltaTJD, GST} from './horison';
+import {obliquity, toEquatorial, toHorizontal, toHorizontal2, deltaTJD, GST, horizontalSep} from './horison';
 
 const {cos, sin, tan, atan, atan2, asin, acos, abs, floor, sqrt, PI} = Math;
 
@@ -147,10 +147,12 @@ export class Polynom {
      * 
      * @param {Number} jd
      * @param {Object} g
-     * @param {String} altMethod
+     * @param {Object} method
      * @returns {Object}
      */
-    calc(jd, g, altMethod = 'a') {
+    calc(jd, g, method) {
+        method = method || {};
+        const altMethod = method.alt || 'a';
         const POLYNOM = this.POLYNOM;
         const x = jd - this.T0;
         const result = {
@@ -253,10 +255,12 @@ export class Position {
      * 
      * @param {Number} jd
      * @param {Object} g
-     * @param {String} altMethod
+     * @param {Object} method
      * @returns {Object}
      */
-    calc(jd, g, altMethod = 'a') {
+    calc(jd, g, method) {
+        method = method || {};
+        const altMethod = method.alt || 'a';
         let deltaT = deltaTJD(jd);
         let jde = jd + deltaT / 86400;
         let {lon, lat, range} = this.func(jde);
@@ -279,7 +283,17 @@ export class Position {
 
         if (this.solar) {
             let sun = this.solar.calc(jd);
-            result.elongation = angle.sep(sun, result);
+
+            if (g && method.elongation == 't') {
+                const p1 = toHorizontal2(result, g);
+                const p2 = toHorizontal2(sun, g);
+
+                p1.alt -= (result.hp || 0) * cos(p1.alt);
+                p2.alt -= (sun.hp || 0) * cos(p2.alt);
+                result.elongation = horizontalSep(p1, p2);
+            } else {
+                result.elongation = angle.sep(sun, result);
+            }
             const [sψ, cψ] = base.sincos(result.elongation);
             result.i = atan(sun.range * sψ / (result.range - sun.range * cψ));
             result.fraction = (1 + cos(result.i)) / 2;
@@ -334,10 +348,12 @@ export class Position {
      * @param {Number} jd1
      * @param {Number} interval
      * @param {Object} g
-     * @param {String} altMethod 
+     * @param {Object} method 
      * @returns {Array}
      */
-    list(jd0, jd1, interval, g, altMethod = 'a') {
+    list(jd0, jd1, interval, g, method) {
+        method = method || {};
+        const altMethod = method.alt || 'a';
         if (jd1 <= jd0) {
             return [];
         }
@@ -359,10 +375,19 @@ export class Position {
                     sunPoly = this.solar.polynom(T0, 0, 1);
                 }
                 while ((jd <= T0 + 1) && (jd < jd1)) {
-                    let pos = polynom.calc(jd, g, altMethod);
+                    let pos = polynom.calc(jd, g, method);
                     if (sunPoly) {
                         let sun = sunPoly.calc(jd);
-                        pos.elongation = angle.sep(sun, pos);
+                        if (g && method.elongation == 't') {
+                            const p1 = toHorizontal2(pos, g);
+                            const p2 = toHorizontal2(sun, g);
+
+                            p1.alt -= (pos.hp || 0) * cos(p1.alt);
+                            p2.alt -= (sun.hp || 0) * cos(p2.alt);
+                            pos.elongation = horizontalSep(p1, p2);
+                        } else {
+                            pos.elongation = angle.sep(sun, pos);
+                        }
                         const [sψ, cψ] = base.sincos(pos.elongation);
                         let i = atan(sun.range * sψ / (pos.range - sun.range * cψ));
                         if (i < 0) {
@@ -379,10 +404,20 @@ export class Position {
             }
         } else {
             while (jd <= jd1) {
-                let pos = this.calc(jd, g, altMethod);
+                let pos = this.calc(jd, g, method);
                 if (this.solar) {
                     let sun = this.solar.calc(jd);
-                    pos.elongation = angle.sep(sun, pos);
+
+                    if (g && method.elongation == 't') {
+                        const p1 = toHorizontal2(pos, g);
+                        const p2 = toHorizontal2(sun, g);
+
+                        p1.alt -= (pos.hp || 0) * cos(p1.alt);
+                        p2.alt -= (sun.hp || 0) * cos(p2.alt);
+                        pos.elongation = horizontalSep(p1, p2);
+                    } else {
+                        pos.elongation = angle.sep(sun, pos);
+                    }
                     const [sψ, cψ] = base.sincos(pos.elongation);
                     pos.i = atan(sun.range * sψ / (pos.range - sun.range * cψ));
                     pos.fraction = (1 + cos(pos.i)) / 2;

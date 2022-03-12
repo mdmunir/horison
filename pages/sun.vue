@@ -65,7 +65,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="altMethod">Altitude</label>
-                                    <select class="form-control" id="altMethod" v-model="format.altMethod" @change="calcList">
+                                    <select class="form-control" id="altMethod" v-model="format.alt" @change="calcList">
                                         <option value="g">Geosentris</option>
                                         <option value="t">Toposentris</option>
                                         <option value="a">Apparent</option>
@@ -141,7 +141,7 @@
                 },
                 format: {
                     sudut: 'decimal',
-                    altMethod: 'a',
+                    alt: 'a',
                 },
                 units: units,
                 columns,
@@ -180,7 +180,7 @@
                 let jd2 = (this.model.to || moment().format('YYYY-MM-DD [23:59:59.99]')).toJD();
                 if (jd1 && jd2) {
                     let step = this.model.interval * units[this.model.unit].value / (24 * 3600);
-                    this.rows = solar.list(jd1, jd2, step, this.globe, this.format.altMethod).map(v => {
+                    this.rows = solar.list(jd1, jd2, step, this.globe, this.format).map(v => {
                         v.date = Date.fromJD(v.jd);
                         v.lon *= R2D;
                         v.lat *= R2D;

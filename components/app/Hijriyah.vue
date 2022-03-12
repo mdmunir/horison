@@ -25,7 +25,11 @@
         </tbody>
         <tfoot v-if="showNote">
             <tr>
-                <td colspan="7" v-html="info.note" style="text-align: left;font-size: 0.8em;"></td>
+                <td colspan="7" style="text-align: left;font-size: 0.8em;">
+                    Konjungsi: <b>{{info.conjuction}}</b>.
+                    Pada saat Maghrib tanggal <b>{{info.sunset}}</b>, altitude bulan = <b>{{info.alt}}°</b>,
+                    elongasi = <b>{{info.elongation}}°</b> dan umur bulan = <b>{{info.age}}</b>.
+                </td>
             </tr>
         </tfoot>
     </table>
@@ -129,14 +133,16 @@
                 let sConjuction = moment(info.conjunction.toDate()).utcOffset(offset).format('dddd, D MMMM YYYY [pukul] HH:mm:ss');
                 let sSunset = moment(info.sunSet.toDate()).utcOffset(offset).format('D MMM YYYY HH:mm:ss');
                 let sAge = info.age > 0 ? (info.age * 24).hms(0, true) : '-';
-                let note = `Konjungsi: <b>${sConjuction}</b>.
-Pada saat Maghrib tanggal <b>${sSunset}</b>, altitude bulan = <b>${(info.alt * R2D).toFixed(4)}°</b>,
-elongasi = <b>${(info.elongation * R2D).toFixed(4)}°</b> dan umur bulan = <b>${sAge}</b>.`;
+
                 return{
                     name: `${MONTHS[info.month - 1].name} ${info.year.toArab()}`,
                     masehi: masehi,
                     matrix: matrix,
-                    note,
+                    conjuction: sConjuction,
+                    sunset: sSunset,
+                    alt: (info.alt * R2D).toFixed(4),
+                    elongation: (info.elongation * R2D).toFixed(4),
+                    age: sAge,
                 }
             }
         }
