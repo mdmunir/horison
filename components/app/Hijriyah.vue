@@ -3,7 +3,13 @@
         <thead>
             <tr>
                 <td colspan="7">
-                    <div style="font-size: 1.8em;">{{info.name}}</div>
+                    <a class="btn btn-sm float-left" @click="navClick(0)" v-if="showNav" title="Today">
+                        <i class="fas fa-calendar-day"></i></a>
+                    <div style="font-size: 1.8em;">
+                        <a class="btn btn-sm" @click="navClick(-1)" v-if="showNav">&lt;</a>
+                        {{info.name}}
+                        <a class="btn btn-sm" @click="navClick(1)" v-if="showNav">&gt;</a>
+                    </div>
                     <span style="font-size: 0.9em;">{{info.masehi}}</span>
                 </td>
             </tr>
@@ -42,8 +48,8 @@
         opacity: 0.25;
     }
     td div{
-        margin-bottom: -0.3em;
-        margin-top: -0.3em;
+        margin-bottom: -0.4em;
+        margin-top: -0.4em;
     }
 </style>
 <script>
@@ -85,11 +91,16 @@
             showNote: {
                 type: Boolean,
                 default: false,
+            },
+            showNav: {
+                type: Boolean,
+                default: false,
             }
         },
         data() {
             return{
                 dayNames: DAYS,
+                current: {}
             }
         },
         computed: {
@@ -98,6 +109,9 @@
                 const globe = Globe.fromLoc(this.loc || {});
                 const h = new Hijriah(criteria);
                 const info = h.calcMonth(globe, this.year, this.month);
+                this.current.year = info.year;
+                this.current.month = info.month;
+
                 let jd = Math.floor(info.jd + 1);
                 const dow = (jd + 1) % 7;
                 const weeks = Math.floor((dow + info.count) / 7) + 1;
@@ -144,6 +158,28 @@
                     elongation: (info.elongation * R2D).toFixed(4),
                     age: sAge,
                 }
+            }
+        },
+        methods: {
+            navClick(v) {
+                let {year, month} = this.current;
+                if (v == -1) {
+                    month--;
+                    if (month < 1) {
+                        year--;
+                        month = 12;
+                    }
+                } else if (v == 1) {
+                    month++;
+                    if (month > 12) {
+                        year++;
+                        month = 1;
+                    }
+                } else {
+                    year = undefined;
+                    month = undefined;
+                }
+                this.$emit('nav', {year, month});
             }
         }
     }

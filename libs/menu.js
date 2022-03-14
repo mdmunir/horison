@@ -6,8 +6,8 @@ const m = [
     {label: 'Kalender Hijriah', 'url': '/calendar', icon: 'nav-icon far fa-calendar'},
     {label: 'Generate Polynom', 'url': '/polynom', icon: 'nav-icon fas fa-calculator'},
     {label: 'Kalkulator', 'url': '/calc', icon: 'nav-icon fas fa-calculator'},
-    'LAIN-LAIN',
-    {label: 'Setting', 'url': '/setting', icon: 'nav-icon fas fa-tools'},
+//    'LAIN-LAIN',
+//    {label: 'Setting', 'url': '/setting', icon: 'nav-icon fas fa-tools'},
 ];
 
 export default m;

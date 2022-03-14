@@ -23,7 +23,15 @@
         props: {
             type: {type: String, default: 'default'},
             title: String,
-            buttons: String
+            buttons: String,
+        },
+        mounted() {
+            let $card = $(this.$el);
+            if ($card.hasClass('collapsed-card')) {
+                $card.children('.card-header')
+                    .find('[data-card-widget="collapse"]')
+                    .html('<i class="fas fa-plus"></i>');
+            }
         },
         computed: {
             showHeader() {
@@ -37,7 +45,7 @@
                 if (typeof bs === 'string') {
                     bs = bs.split(/\s*,\s*/);
                 }
-                
+
                 return bs ? bs.map(function (b) {
                     if (Buttons[b]) {
                         return {func: b, icon: Buttons[b]};

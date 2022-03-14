@@ -14,9 +14,8 @@
         <div class="row">
             <div class="col-12">
                 <lte-card>
-                    <a-hijriyah v-bind="hijriyah"></a-hijriyah>
+                    <a-hijriyah v-bind="hijriyah" @nav="navClick"></a-hijriyah>
                 </lte-card>
-                
             </div>
         </div>
     </lte-content>
@@ -34,9 +33,19 @@
         maghrib: 'Maghrib',
         isya: 'Isya',
     }
+
+    const MONTH = {
+        year: undefined,
+        month: undefined,
+    };
     export default {
         head: {
             title: 'Horison'
+        },
+        data() {
+            return {
+                model: MONTH,
+            }
         },
         computed: {
             times() {
@@ -61,11 +70,19 @@
                 const loc = this.$store.state.location || {};
                 const criteria = this.$store.state.criteria || {};
                 const info = {
+                    ...this.model,
                     loc: {...loc},
                     criteria: {...criteria},
+                    showNav: true,
                 };
                 return info;
             }
         },
+        methods: {
+            navClick(v) {
+                this.model.year = v.year;
+                this.model.month = v.month;
+            }
+        }
     }
 </script>

@@ -7,6 +7,8 @@
         <lte-sidebar ></lte-sidebar>
         <Nuxt></Nuxt>
         <lte-footer ></lte-footer>
+        <a-setting-modal id="setting-modal"></a-setting-modal>
+        <portal-target name="modals"></portal-target>
     </div>
 </template>
 <script>
