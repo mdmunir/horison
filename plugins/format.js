@@ -161,7 +161,7 @@ Date.prototype.getDay = function () {
     if (t >= T0_GREGORIAN) {
         return oldGetDay.call(this);
     }
-    return Math.floor(this.toJD() + 1.5 + this.getTimezoneOffset()/1440) % 7;
+    return Math.floor(this.toJD() + 1.5 - this.getTimezoneOffset() / 1440) % 7;
 }
 
 let oldUTCGetDay = Date.prototype.getUTCDay;
