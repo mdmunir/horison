@@ -66,6 +66,7 @@
         ['J', 'JUMAT'],
         ['S', 'SABTU'],
     ];
+    const WEEKDAYS = [...moment.weekdays()];
     const PASARAN = [
         'PON',
         'WAGE',

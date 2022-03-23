@@ -140,7 +140,7 @@ Date.prototype.toJD = function () {
     if (t >= T0_GREGORIAN) {
         return JD0_GREGORIAN + (t - T0_GREGORIAN) / MS_DAY;
     }
-    return julian.DateToJD(this);
+    return new julian.Calendar().fromDate(this).toJD();
 }
 
 /**
@@ -152,5 +152,23 @@ Date.fromJD = function (jd) {
     if (jd >= JD0_GREGORIAN) {
         return new Date((jd - JD0_GREGORIAN) * MS_DAY + T0_GREGORIAN + 1);
     }
-    return julian.JDToDate(jd + 1 / MS_DAY);
+    return new julian.Calendar().fromJD(jd + 1 / MS_DAY).toDate();
+}
+
+let oldGetDay = Date.prototype.getDay;
+Date.prototype.getDay = function () {
+    let t = this.getTime();
+    if (t >= T0_GREGORIAN) {
+        return oldGetDay.call(this);
+    }
+    return Math.floor(this.toJD() + 1.5 + this.getTimezoneOffset()/1440) % 7;
+}
+
+let oldUTCGetDay = Date.prototype.getUTCDay;
+Date.prototype.getUTCDay = function () {
+    let t = this.getTime();
+    if (t >= T0_GREGORIAN) {
+        return oldUTCGetDay.call(this);
+    }
+    return Math.floor(this.toJD() + 1.5) % 7;
 }
