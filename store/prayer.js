@@ -19,9 +19,9 @@ export const mutations = {
         Object.assign(state, config);
         localStorage.setItem('horison/prayer', JSON.stringify(state));
 
-        BroadcastChannel.myRefresh();
+        BroadcastChannel.refreshState('prayer/refresh', config);
     },
-    refresh(state) {
-        Object.assign(state, JSON.parse(localStorage.getItem('horison/prayer')) || {});
+    refresh(state, config) {
+        Object.assign(state, config);
     }
 }

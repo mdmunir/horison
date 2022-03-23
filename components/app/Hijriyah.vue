@@ -129,13 +129,12 @@
                         } else if (d > info.count) {
                             dd = d - info.count;
                         }
-
-                        let date = (x - dow + jd).toDate();
+                        let {day} = (x - dow + jd).toCalendar();
                         let pekan = (x - dow + jd + 3) % 5;
                         row.push({
-                            d, date, dd,
+                            d, dd,
                             dArab: dd.toArab(),
-                            mDay: date.getDate(),
+                            mDay: Math.floor(day),
                             pekan: PASARAN[pekan],
                             isActive: (d >= 1 && d <= info.count),
                         });

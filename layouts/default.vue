@@ -11,19 +11,3 @@
         <portal-target name="modals"></portal-target>
     </div>
 </template>
-<script>
-    export default {
-        async mounted() {
-            const workbox = await window.$workbox;
-            if (workbox) {
-                workbox.addEventListener('installed', (event) => {
-                    if (event.isUpdate) {
-                        window.location.reload();
-                    }
-                });
-            }
-
-            BroadcastChannel.myListen(this.$store);
-        },
-    }
-</script>

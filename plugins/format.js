@@ -83,6 +83,10 @@ Number.prototype.toArab = function (fixed) {
     return s.replace(/\d/g, m => ARABS[parseInt(m)]);
 }
 
+Number.prototype.toCalendar = function () {
+    return julian.JDToCalendar(this, this < JD0_GREGORIAN);
+}
+
 Number.prototype.toScientific = function (digit, f) {
     let n = Math.log10(Math.abs(this));
     if (n > digit) {

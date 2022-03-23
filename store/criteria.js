@@ -13,9 +13,9 @@ export const mutations = {
         Object.assign(state, config);
         localStorage.setItem('horison/criteria', JSON.stringify(state));
 
-        BroadcastChannel.myRefresh();
+        BroadcastChannel.refreshState('criteria/refresh', config);
     },
-    refresh(state) {
-        Object.assign(state, JSON.parse(localStorage.getItem('horison/criteria')) || {});
+    refresh(state, config) {
+        Object.assign(state, config);
     }
 }
