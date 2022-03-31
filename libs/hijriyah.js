@@ -27,12 +27,19 @@ export const MONTHS = _MONTHS.map((v, i) => {
     return {id: i + 1, name: v};
 });
 
-export function currentMonth(d = 0) {
-    let d2000 = (new Date).toJD() - 2451545.0 + d;
-    let k = floor(d2000 / 29.53066257024) + 17050 - 1;
+export function currentMonth() {
+    let jd = (new Date).toJD();
+    let year = (jd - 2451545.0) / 365.25 + 2000;
+    let nm = moonphase.newMoon(year);
+    let k = floor((nm - 2451545.0) / 29.53066257024) + 17050 - 1;
+    let d = floor(jd - nm + 1);
+    if (nm > jd - 0.5) {
+        k--;
+        d = 30;
+    }
     let y = floor(k / 12);
     let m = k % 12;
-    return [y, m + 1];
+    return [y, m + 1, d];
 }
 
 const hilalCaches = {};
