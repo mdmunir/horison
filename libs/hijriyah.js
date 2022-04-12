@@ -183,9 +183,9 @@ export class Criteria {
         if (typeof alt === 'object') {
             age = alt.age;
             elongation = alt.elongation;
-            alt = alt.alt;
             method_alt = alt.method_alt;
             method_elongation = alt.method_elongation;
+            alt = alt.alt;
         }
         this.alt = (alt || 0) * D2R;
         this.elongation = (elongation || 0) * D2R;
