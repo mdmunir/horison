@@ -46,7 +46,7 @@
     </form>
 </template>
 <script>
-    import locations from '@/libs/location';
+    import locations from '@/libs/location2';
     import timezones from '@/libs/timezone';
 
     export default {

@@ -266,7 +266,7 @@ export class Hijriah {
             lastNewMoonJD = newMoonJD;
             result[k - k1] = {
                 year: y, month: m,
-                jd: Math.floor(newMoonJD),
+                jd: newMoonJD,
                 count: days,
                 sunSet: info.sunSet,
                 moonSet: info.moonSet,

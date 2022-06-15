@@ -66,7 +66,7 @@
         ['J', 'JUMAT'],
         ['S', 'SABTU'],
     ];
-    const WEEKDAYS = [...moment.weekdays()];
+    //const WEEKDAYS = [...moment.weekdays()];
     const PASARAN = [
         'PON',
         'WAGE',
@@ -113,7 +113,8 @@
                 this.current.year = info.year;
                 this.current.month = info.month;
 
-                let jd = Math.floor(info.jd + 1);
+                const offset = this.loc.offset || 420;
+                let jd = Math.floor(info.jd + 0.5 + offset / (24 * 60));
                 const dow = (jd + 1) % 7;
                 const weeks = Math.floor((dow + info.count) / 7) + 1;
                 const matrix = [];
@@ -143,7 +144,6 @@
                     matrix.push(row);
                 }
                 let masehi = `${moment(jd.toDate()).format('MMMM YYYY')} - ${moment((jd + info.count).toDate()).format('MMMM YYYY')}`;
-                let offset = this.loc.offset || 420;
                 let sConjuction = moment(info.conjunction.toDate()).utcOffset(offset).format('dddd, D MMMM YYYY [pukul] HH:mm:ss');
                 let sSunset = moment(info.sunSet.toDate()).utcOffset(offset).format('D MMM YYYY HH:mm:ss');
                 let sAge = info.age > 0 ? (info.age * 24).hms(0, true) : '-';
@@ -180,6 +180,9 @@
                     month = undefined;
                 }
                 this.$emit('nav', {year, month});
+            },
+            writePdf(doc){
+                
             }
         }
     }

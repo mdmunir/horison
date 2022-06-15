@@ -33,9 +33,10 @@ const m = {
             //{src: `${DEPLOY_PATH}plugins/jquery-ui/jquery-ui.min.js`, body: true},
             {src: `${DEPLOY_PATH}plugins/bootstrap/js/bootstrap.bundle.min.js`, body: true},
             {src: `${DEPLOY_PATH}plugins/select2/js/select2.full.min.js`, body: true},
-            {src: `${DEPLOY_PATH}plugins/moment/moment.min.js`, body: true},
-            {src: `${DEPLOY_PATH}plugins/moment/locales.min.js`, body: true},
-            {src: `${DEPLOY_PATH}dist/js/adminlte.js`, body: true}
+//            {src: `${DEPLOY_PATH}plugins/moment/moment.min.js`, body: true},
+//            {src: `${DEPLOY_PATH}plugins/moment/locales.min.js`, body: true},
+            {src: `${DEPLOY_PATH}dist/js/adminlte.js`, body: true},
+            {src: 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js', body:true},
         ],
         bodyAttrs: {
             class: 'hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed'
