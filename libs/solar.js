@@ -2,8 +2,9 @@ import planetposition from 'astronomia/src/planetposition';
 import solar from 'astronomia/src/solar';
 import vsop87Bearth from 'astronomia/data/vsop87Bearth';
 
-const earth = new planetposition.Planet(vsop87Bearth);
 const AU = 149597870;
+
+export const earth = new planetposition.Planet(vsop87Bearth);
 
 /**
  * trueVSOP87 returns the true geometric position of the sun as ecliptic coordinates.

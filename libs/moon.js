@@ -2,7 +2,7 @@ import elp from 'astronomia/src/elp';
 import moonposition from 'astronomia/src/moonposition';
 import elpMppDe from 'astronomia/data/elpMppDe';
 
-const elpMoon = new elp.Moon(elpMppDe);
+export const elpMoon = new elp.Moon(elpMppDe);
 
 /**
  *
