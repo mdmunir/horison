@@ -1,7 +1,7 @@
 <template>
     <lte-content title="Eclipse">
         <div class="row">
-            <div class="col-12">
+            <div class="col-12 col-md-6">
                 <lte-card :title="sTime">
                     <template #tools>
                         <button class="btn btn-tool" @click="zoom = (zoom<100)?zoom+1:100">
@@ -14,10 +14,34 @@
                             <i class="fas fa-save"></i>
                         </button>
                     </template>
-                    <input type="range" min="0" max="1000" style="width: 100%;" v-model="slider"
-                           @input="sliderChange(false)"/>
-
-                    <a-globe ref="globe" :zoom="zoom"
+                    <input type="range" min="0" max="1000" style="width: 100%;" v-model="slider"/>
+                    <div class="row">
+                        <div class="col-md-3 col-6">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input"  v-model="options.sun" id="ck_sun">
+                                <label class="form-check-label" for="ck_sun">Matahari</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input"  v-model="options.moon" id="ck_moon">
+                                <label class="form-check-label" for="ck_moon">Bulan</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input"  v-model="options.line" id="ck_line">
+                                <label class="form-check-label" for="ck_line">Garis Bayangan</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input"  v-model="options.rotation" id="ck_rotation">
+                                <label class="form-check-label" for="ck_rotation">Rotasi</label>
+                            </div>
+                        </div>
+                    </div>
+                    <a-globe ref="globe" :zoom="zoom" :control="!options.rotations"
                              :uniform="uniform" :camera-pos="cameraPos"
                              :vertex-shader="vertexShader" :fragment-shader="fragmentShader"
                              ></a-globe>
@@ -69,16 +93,21 @@
                     lon: 0,
                     distance: 4,
                 },
-                t: 0,
                 zoom: 100,
                 animated: true,
+                options: {
+                    sun: true,
+                    moon: true,
+                    line: true,
+                    rotation: true,
+                },
             }
         },
         mounted() {
             this.sliderChange();
         },
         methods: {
-            sliderChange(camera = false) {
+            sliderChange() {
                 if (this.info.type == 0 || !this.animated) {
                     return;
                 }
@@ -86,9 +115,6 @@
                 const bessel = this.eclipse.calc(this.t);
 
                 this.updatePath(bessel);
-                if (camera) {
-                    this.updateCamera(bessel);
-            }
             },
             updatePath(bessel) {
                 var uniforms2 = this.uniform;
@@ -101,33 +127,63 @@
                 uniforms2.l2.value = bessel.l2;
                 uniforms2.tanf1.value = bessel.tanF1;
                 uniforms2.tanf2.value = bessel.tanF2;
-            },
-            updateCamera(bessel) {
-                this.cameraPos.lon = bessel.μ;
-                this.cameraPos.lat = bessel.d;
+
+                if (this.options.rotation) {
+                    this.cameraPos.lon = bessel.μ;
+                    this.cameraPos.lat = bessel.d;
+                }
             },
             async simpan() {
-                if (this.info.type == 0) {
+                if (!this.isValid) {
                     return;
                 }
                 this.animated = false;
                 var th = this;
                 const {p1, p4} = this.info;
+                const opts = {
+                    duration: 30,
+                    fps: 10,
+                };
                 await this.$refs.globe.download(function (i) {
-                    var t = p1 + (p4 - p1) * i;
-                    const bessel = th.eclipse.calc(t);
-
-                    th.updatePath(bessel);
-                    th.updateCamera(bessel);
-                }, 15, 15);
+//                    var t = p1 + (p4 - p1) * i;
+//                    const bessel = th.eclipse.calc(t);
+//                    th.updatePath(bessel);
+                    th.slider = 1000 * i;
+                }, opts);
                 this.animated = true;
             }
         },
         computed: {
+            isValid() {
+                return this.info.type > 0;
+            },
+            time() {
+                if (this.isValid) {
+                    const {p1, p4} = this.info;
+                    return p1 + (p4 - p1) * this.slider / 1000;
+                }
+            },
             sTime() {
-                if (this.info.type > 0) {
-                    let jde = this.info.JDE0 + this.t / 24;
+                if (this.isValid) {
+                    let jde = this.info.JDE0 + (this.time - this.info.deltaT / 3600) / 24;
                     return moment(jde.toDate()).utc().format('DD MMMM YYYY, hh:mm:ss [UTC]');
+                }
+            },
+            bessel() {
+                if (this.isValid) {
+                    return this.eclipse.calc(this.time);
+                }
+            }
+        },
+        watch: {
+            'options.rotation': function (v) {
+                if (v) {
+                    this.updatePath(this.bessel);
+                }
+            },
+            slider() {
+                if (this.isValid) {
+                    this.updatePath(this.bessel);
                 }
             }
         }

@@ -27,6 +27,10 @@
                 type: Number,
                 default: 100,
             },
+            control: {
+                type: Boolean,
+                default: true,
+            }
         },
         created() {
             var padding = 0.05;
@@ -73,6 +77,7 @@
             controls.addEventListener('change', function () {
                 th.render();
             });
+            controls.enabled = this.control;
 
             window.addEventListener('resize', function () {
                 th.onWindowResize();
@@ -113,7 +118,7 @@
                     //this.controls.handleResize();
                 }
             },
-            async download(callback, duration = 10, fps = 30) {
+            async download(callback, options = {}) {
                 var th = this;
                 this.animated = false;
                 var buffer = await generateGIF(this.renderer.domElement, function (progress) {
@@ -121,7 +126,7 @@
                         callback(progress);
                     }
                     th.render();
-                }, duration, fps, 25);
+                }, options);
                 const blob = new Blob([buffer], {type: 'image/gif'});
                 this.animated = true;
 
@@ -146,6 +151,9 @@
                 let zoom = Math.min(100, Math.max(10, v));
                 let width = Math.floor(this.$el.offsetWidth * zoom / 100);
                 this.renderer.setSize(width, width);
+            },
+            control(v) {
+                this.controls.enabled = v;
             }
         }
     }

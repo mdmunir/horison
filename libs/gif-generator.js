@@ -1,6 +1,10 @@
 const {GifWriter} = require('omggif');
 
-export function generateGIF(element, renderFunction, duration = 1, fps = 30, depth = 25, callback = null) {
+export function generateGIF(element, renderFunction, options={}) {
+    const duration = options.duration || 10;
+    const fps = options.fps || 30;
+    const depth = options.depth || 25;
+    
     const frames = duration * fps;
 
     const canvas = document.createElement('canvas');
@@ -47,8 +51,8 @@ export function generateGIF(element, renderFunction, duration = 1, fps = 30, dep
         writer.addFrame(0, 0, canvas.width, canvas.height, pixels, options);
 
         current++;
-        if (callback) {
-            callback(current / frames);
+        if (options.callback) {
+            options.callback(current / frames);
         }
         if (current < frames) {
             await setTimeout(addFrame, 0, resolve);
