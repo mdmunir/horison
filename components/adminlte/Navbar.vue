@@ -17,3 +17,14 @@
         </ul>     
     </nav>
 </template>
+
+<script>
+    export default {
+        mounted() {
+            let th = this;
+            $('[data-widget="pushmenu"]').on('collapsed.lte.pushmenu shown.lte.pushmenu', function (e) {
+                th.$nuxt.$emit('pushmenu-click', e.type);
+            });
+        }
+    }
+</script>

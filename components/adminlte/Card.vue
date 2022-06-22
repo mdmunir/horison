@@ -3,10 +3,10 @@
         <div class="card-header" v-if="showHeader">
             <h3 class="card-title" v-html="title"></h3>
             <div class="card-tools">
+                <slot name="tools"></slot>
                 <button v-for="btn in toolButtons" type="button" class="btn btn-tool" :data-card-widget="btn.func">
                     <i :class="btn.icon"></i>
                 </button>
-                <slot name="tools"></slot>
             </div>
         </div>
         <div class="card-body"><slot></slot></div>
@@ -32,6 +32,14 @@
                     .find('[data-card-widget="collapse"]')
                     .html('<i class="fas fa-plus"></i>');
             }
+            let th = this;
+            const events = ['expanded', 'collapsed', 'maximized', 'minimized', 'removed'];
+            events.forEach(function(name){
+                $card.on(`${name}.lte.cardwidget`, function(){
+                    th.$emit(name);
+                    th.$emit('resize', name);
+                });
+            });
         },
         computed: {
             showHeader() {

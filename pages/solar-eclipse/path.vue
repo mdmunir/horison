@@ -1,40 +1,27 @@
 <template>
-    <lte-content title="Eclipse">
-        <div class="row">
+    <lte-content :title="'Gerhana Matahari '+(info.date || '')">
+        <div v-if="!isValid">
+            Gerhana tidak ditemukan.
+        </div>
+        <div class="row" v-else>
             <div class="col-12 col-md-6">
-                <lte-card :title="sTime">
+                <lte-card :title="sTime" buttons="maximize" @resize="$refs.globe.resize(300)">
                     <template #tools>
-                        <button class="btn btn-tool" @click="zoom = (zoom<100)?zoom+1:100">
-                            <i class="fa fa-search-plus"></i>
-                        </button>
-                        <button class="btn btn-tool" @click="zoom = (zoom>10)?zoom-1:10">
-                            <i class="fa fa-search-minus"></i>
-                        </button>
                         <button class="btn btn-tool" @click="simpan">
                             <i class="fas fa-save"></i>
                         </button>
                     </template>
-                    <input type="range" min="0" max="1000" style="width: 100%;" v-model="slider"/>
                     <div class="row">
-                        <div class="col-md-3 col-6">
-                            <div class="form-check">
-                                <input type="checkbox" class="form-check-input"  v-model="options.sun" id="ck_sun">
-                                <label class="form-check-label" for="ck_sun">Matahari</label>
-                            </div>
+                        <div class="col-12">
+                            <button class="btn btn-sm btn-flat" @click="run">
+                                <i class="fas" :class="{'fa-play':!onPlay, 'fa-stop':onPlay}"></i>
+                            </button>
+                            <input type="range" min="0" max="1000" style="width: 90%;" v-model.number="slider"/>
                         </div>
-                        <div class="col-md-3 col-6">
-                            <div class="form-check">
-                                <input type="checkbox" class="form-check-input"  v-model="options.moon" id="ck_moon">
-                                <label class="form-check-label" for="ck_moon">Bulan</label>
-                            </div>
+                        <div class="col-6">
+                            <input type="range" min="20" max="100" style="width: 100%;" v-model.number="zoom"/>
                         </div>
-                        <div class="col-md-3 col-6">
-                            <div class="form-check">
-                                <input type="checkbox" class="form-check-input"  v-model="options.line" id="ck_line">
-                                <label class="form-check-label" for="ck_line">Garis Bayangan</label>
-                            </div>
-                        </div>
-                        <div class="col-md-3 col-6">
+                        <div class="col-6">
                             <div class="form-check">
                                 <input type="checkbox" class="form-check-input"  v-model="options.rotation" id="ck_rotation">
                                 <label class="form-check-label" for="ck_rotation">Rotasi</label>
@@ -51,6 +38,19 @@
 
             </div>
         </div>
+        <portal to="modals">
+            <lte-modal size="sm" ref="popupSave" data-backdrop="static" 
+                       @hide="cancelGif=true" title="Download GIF">
+                <p>{{progressSave}}% Complete</p>
+                <div class="progress">
+                    <div class="progress-bar bg-primary progress-bar-striped" role="progressbar"
+                         :aria-valuenow="progressSave" aria-valuemin="0" aria-valuemax="100"
+                         :style="{'width': progressSave+'%'}">
+                        <span class="sr-only">{{progressSave}}% Complete</span>
+                    </div>
+                </div>
+            </lte-modal>
+        </portal>
     </lte-content>
 </template>
 <script>
@@ -65,14 +65,15 @@
     const ESQ = 0.006694381;
 
     export default {
+        head: {
+            title: 'Gerhana Matahari',
+        },
+        created() {
+            this.eclipse = null;
+        },
         data() {
-            let y = this.$route.params.year;
-            var eclipse = new Eclipse(y);
-            var info = eclipse.info();
-
             return {
-                eclipse: eclipse,
-                info: info,
+                info: {type: 0, date: null},
                 uniform: {
                     esq: {value: ESQ},
                     x: {value: 0},
@@ -94,27 +95,41 @@
                     distance: 4,
                 },
                 zoom: 100,
-                animated: true,
                 options: {
                     sun: true,
                     moon: true,
                     line: true,
                     rotation: true,
                 },
+                intervalID: null,
+                progressSave: 0,
+                cancelGif: false,
             }
         },
         mounted() {
-            this.sliderChange();
+            this.update(this.$route.query.date);
         },
         methods: {
-            sliderChange() {
-                if (this.info.type == 0 || !this.animated) {
-                    return;
+            update(date) {
+                this.eclipse = new Eclipse(date);
+                var info = this.eclipse.info();
+                //Object.assign(this.info, info);
+                this.info = info;
+            },
+            run() {
+                if (this.onPlay) {
+                    clearInterval(this.intervalID);
+                    this.intervalID = null;
+                } else {
+                    let th = this;
+                    this.intervalID = setInterval(function () {
+                        th.slider += 1;
+                        if (th.slider >= 1000) {
+                            clearInterval(th.intervalID);
+                            th.intervalID = null;
+                        }
+                    }, 100);
                 }
-                this.t = this.info.p1 + (this.info.p4 - this.info.p1) * this.slider * 0.001;
-                const bessel = this.eclipse.calc(this.t);
-
-                this.updatePath(bessel);
             },
             updatePath(bessel) {
                 var uniforms2 = this.uniform;
@@ -137,20 +152,23 @@
                 if (!this.isValid) {
                     return;
                 }
-                this.animated = false;
                 var th = this;
                 const {p1, p4} = this.info;
                 const opts = {
                     duration: 30,
                     fps: 10,
+                    filename: `solar-eclipse-${th.info.date}.gif`,
                 };
+                this.cancelGif = false;
+                this.$refs.popupSave.modal('show');
                 await this.$refs.globe.download(function (i) {
-//                    var t = p1 + (p4 - p1) * i;
-//                    const bessel = th.eclipse.calc(t);
-//                    th.updatePath(bessel);
                     th.slider = 1000 * i;
+                    th.progressSave = Math.floor(i * 100);
+                    if (th.cancelGif) {
+                        return false;
+                    }
                 }, opts);
-                this.animated = true;
+                this.$refs.popupSave.modal('hide');
             }
         },
         computed: {
@@ -173,6 +191,9 @@
                 if (this.isValid) {
                     return this.eclipse.calc(this.time);
                 }
+            },
+            onPlay() {
+                return this.intervalID != null;
             }
         },
         watch: {
@@ -183,6 +204,15 @@
             },
             slider() {
                 if (this.isValid) {
+                    this.updatePath(this.bessel);
+                }
+            },
+            '$route.query.date': function (date) {
+                this.update(date);
+            },
+            'info.date': function () {
+                if (this.isValid) {
+                    this.slider = (this.slider == 500 ? 501 : 500);
                     this.updatePath(this.bessel);
                 }
             }

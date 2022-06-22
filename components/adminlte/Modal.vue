@@ -17,10 +17,6 @@
 </template>
 <script>
     export default {
-        created() {
-//            const component = this.$mount();
-//            document.querySelector('body').appendChild(component.$el);
-        },
         props: {
             size: String,
             title: String,
@@ -42,7 +38,7 @@
         },
         computed: {
             showHeader() {
-                return this.$props.title || this.$slots.buttons;
+                return this.$props.title || this.$slots.buttons || this.closeBtn;
             },
             sizeClass() {
                 return this.size ? 'modal-' + this.size : '';

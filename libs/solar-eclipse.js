@@ -207,21 +207,35 @@ export function generateBesselianElement(y, earth, elpMoon) {
 }
 
 const caches = {}
-
+const DATE_REGEX = /\d{4}-\d{2}-\d{2}/
 export class Eclipse {
-    constructor(y) {
+    constructor(date) {
+        if (!DATE_REGEX.test(date)) {
+            this._info = {type: 0};
+            return;
+        }
+        let jd = date.toJD();
+        let y = 2000 + (jd - 2451545.0) / 365.25;
         let k = floor((y - 2000) * 12.3685 + 0.5);
-        if (caches[k]) {
+        if (caches[k] && caches[k].date == date) {
             this._info = caches[k];
             return;
         }
         const info = generateBesselianElement(y, earth, elpMoon);
-        this._info = caches[k] = info;
         if (info.type == 0) {
+            this._info = {type: 0};
             return;
+        } else {
+            let sdate = moment(info.jdeMax.toDate()).utc().format('YYYY-MM-DD');
+            if (sdate != date) {
+                this._info = {type: 0};
+                return;
+            }
+            this._info = caches[k] = info;
         }
+        info.date = date;
         let tMax = (info.jdeMax - info.JDE0) * 24;
-        
+
         // get P1 and P4
         function func(t) {
             let distance = hypot(horner(t, info.x), horner(t, info.y));
@@ -234,7 +248,7 @@ export class Eclipse {
     }
 
     calc(t) {
-        if(this._info.type == 0){
+        if (this._info.type == 0) {
             return {};
         }
         const info = this._info;
@@ -262,8 +276,8 @@ export class Eclipse {
     isValid() {
         return this._info.type > 0;
     }
-    
-    info(){
+
+    info() {
         return this._info;
     }
 }

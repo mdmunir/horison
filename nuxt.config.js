@@ -39,7 +39,7 @@ const m = {
             {src: 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js', body:true},
         ],
         bodyAttrs: {
-            class: 'hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed'
+            class: 'hold-transition sidebar-mini layout-fixed layout-navbar-fixedx layout-footer-fixed'
         }
     },
 

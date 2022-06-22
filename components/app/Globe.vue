@@ -80,15 +80,13 @@
             controls.enabled = this.control;
 
             window.addEventListener('resize', function () {
-                th.onWindowResize();
+                th.resize();
             });
 
             this.animate();
-            th.onWindowResize();
-            $('[data-widget="pushmenu"]').on('collapsed.lte.pushmenu shown.lte.pushmenu', function () {
-                setTimeout(function () {
-                    th.onWindowResize();
-                }, 300);
+            th.resize();
+            this.$nuxt.$on('pushmenu-click', function () {
+                th.resize(300);
             });
         },
         methods: {
@@ -107,23 +105,28 @@
                     th.render();
                 }
             },
-            onWindowResize() {
-                this.camera.aspect = 1;
-                this.camera.updateProjectionMatrix();
-                let zoom = Math.min(100, Math.max(10, this.zoom));
-                let width = Math.floor(this.$el.offsetWidth * zoom / 100);
-                this.renderer.setSize(width, width);
+            resize(time = 0) {
+                let th = this;
+                setTimeout(function () {
+                    th.camera.aspect = 1;
+                    th.camera.updateProjectionMatrix();
+                    let zoom = Math.min(100, Math.max(10, th.zoom));
+                    let width = Math.floor(th.$el.offsetWidth * zoom / 100);
+                    th.renderer.setSize(width, width);
 
-                if (this.controls) {
-                    //this.controls.handleResize();
-                }
+                    if (th.controls) {
+                        //this.controls.handleResize();
+                    }
+                }, time);
             },
             async download(callback, options = {}) {
                 var th = this;
                 this.animated = false;
                 var buffer = await generateGIF(this.renderer.domElement, function (progress) {
                     if (callback) {
-                        callback(progress);
+                        if(callback(progress) === false){
+                            return false;
+                        }
                     }
                     th.render();
                 }, options);
@@ -132,7 +135,7 @@
 
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
-                link.download = 'animation.gif';
+                link.download =  options.filename || 'solar-eclipse.gif';
                 link.dispatchEvent(new MouseEvent('click'));
             }
         },

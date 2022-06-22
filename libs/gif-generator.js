@@ -19,7 +19,10 @@ export function generateGIF(element, renderFunction, options={}) {
 
     let current = 0;
     return new Promise(async function addFrame(resolve) {
-        renderFunction(current/frames);
+        if(renderFunction(current/frames) === false){
+            resolve(buffer.subarray(0, writer.end()));
+            return;
+        }
         context.drawImage(element, 0, 0);
         const data = context.getImageData(0, 0, canvas.width, canvas.height).data;
         const palette = [];
