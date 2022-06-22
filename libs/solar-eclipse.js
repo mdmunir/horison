@@ -16,19 +16,8 @@ const {sin, cos, tan, atan2, atan, asin, PI, floor, hypot} = Math;
 
 const EARTH_RADIUS = 6378;
 const SUN_RADIUS = 109.125;
-const k1 = 0.272281;
+const k1 = 0.272488;
 const k2 = 0.272281;
-
-function toXYZ(pos) {
-    const [sina, cosa] = base.sincos(pos.ra);
-    const [sind, cosd] = base.sincos(pos.dec);
-
-    return [
-        pos.range * cosd * cosa, // x
-        pos.range * cosd * sina, // y
-        pos.range * sind, // z
-    ]
-}
 
 /**
  * 

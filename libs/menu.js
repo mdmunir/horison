@@ -5,7 +5,7 @@ const m = [
     {label: 'Hilal', icon: 'nav-icon far fa-moon',
         children: [
             {label: 'Indonesia', 'url': '/hilal-id', icon: 'far fa-circle nav-icon',},
-            {label: 'Lokal', 'url': '/hilal-local', icon: 'far fa-circle nav-icon',}
+            //{label: 'Lokal', 'url': '/hilal-local', icon: 'far fa-circle nav-icon',}
         ]
     },
     {label: 'Kalender Hijriah', 'url': '/calendar', icon: 'nav-icon far fa-calendar'},

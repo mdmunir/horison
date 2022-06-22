@@ -35,7 +35,23 @@
                 </lte-card>
             </div>
             <div class="col-md-6 col-12">
-
+                <lte-card title="Besselian Element">
+                    <table class="table table-bordered">
+                        <tbody>
+                            <tr style="text-align: center;">
+                                <th>&nbsp;&nbsp;</th>
+                                <th>0</th>
+                                <th>1</th>
+                                <th>2</th>
+                                <th>3</th>
+                            </tr>
+                            <tr v-for="(vals,name) in series">
+                                <th style="text-align: center;">{{name}}</th>
+                                <td style="text-align: right;" v-for="v in vals">{{v}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </lte-card>
             </div>
         </div>
         <portal to="modals">
@@ -194,6 +210,21 @@
             },
             onPlay() {
                 return this.intervalID != null;
+            },
+            series() {
+                const series = ['x', 'y', 'μ', 'd', 'l1', 'l2'];
+                const result = {};
+                if (this.isValid) {
+                    const info = this.info;
+                    series.forEach(name => {
+                        let s = this.info[name].slice(0, 4);
+                        if (name == 'μ' || name == 'd') {
+                            s = s.map(v => v * 180 / Math.PI);
+                        }
+                        result[name] = s.map(v => Math.abs(v) > 5e-8 ? v.toFixed(7) : '');
+                    });
+                }
+                return result;
             }
         },
         watch: {
