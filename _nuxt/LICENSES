@@ -1,3 +1,17 @@
+/**
+ * @copyright 2013 Sonia Keys
+ * @copyright 2016 commenthol
+ * @license MIT
+ * @module eclipse
+ */
+
+/**
+ * @license
+ * Copyright 2010-2022 Three.js Authors
+ * SPDX-License-Identifier: MIT
+ */
+
+
 /*!
   * vue-router v3.5.3
   * (c) 2021 Evan You
@@ -223,13 +237,6 @@
  * @module elp
  */
 
-
-/**
- * @copyright 2013 Sonia Keys
- * @copyright 2016 commenthol
- * @license MIT
- * @module eclipse
- */
 
 /**
  * @license
