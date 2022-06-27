@@ -191,38 +191,53 @@ export function generateBesselianElement(y, earth, elpMoon) {
 
     let tMax = iterate.binaryRoot(diff, -3, 3);
     result.jdeMax = result.JDE0 + tMax / 24;
+    let distance = hypot(base.horner(tMax, result.x), base.horner(tMax, result.y));
+    result.distance = distance * (info.distance > 0 ? 1 : -1);
 
     return result;
 }
 
-const caches = {}
-const DATE_REGEX = /\d{4}-\d{2}-\d{2}/
+const caches = {};
+const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
+const NUMBER_REGEX = /^\d+(\.\d+)?$/;
 export class Eclipse {
     constructor(date) {
-        if (!DATE_REGEX.test(date)) {
+        let y,k, useDate = true;
+        if (NUMBER_REGEX.test(date + '')) {
+            y = date * 1;
+            k = floor((y - 2000) * 12.3685 + 0.5);
+            if (caches[k]) {
+                this._info = caches[k];
+                return;
+            }
+            useDate = false;
+        } else if (DATE_REGEX.test(date)) {
+            let jd = date.toJD();
+            y = 2000 + (jd - 2451545.0) / 365.25;
+            k = floor((y - 2000) * 12.3685 + 0.5);
+            if (caches[k] && caches[k].date == date) {
+                this._info = caches[k];
+                return;
+            }
+        } else {
             this._info = {type: 0};
             return;
         }
-        let jd = date.toJD();
-        let y = 2000 + (jd - 2451545.0) / 365.25;
-        let k = floor((y - 2000) * 12.3685 + 0.5);
-        if (caches[k] && caches[k].date == date) {
-            this._info = caches[k];
-            return;
-        }
+
         const info = generateBesselianElement(y, earth, elpMoon);
+        info.k = k;
         if (info.type == 0) {
             this._info = {type: 0};
             return;
         } else {
             let sdate = moment(info.jdeMax.toDate()).utc().format('YYYY-MM-DD');
-            if (sdate != date) {
+            if (useDate && sdate != date) {
                 this._info = {type: 0};
                 return;
             }
+            info.date = sdate;
             this._info = caches[k] = info;
-        }
-        info.date = date;
+        }        
         let tMax = (info.jdeMax - info.JDE0) * 24;
 
         // get P1 and P4
@@ -271,8 +286,25 @@ export class Eclipse {
     }
 }
 
+export class EclipseDecade {
+    constructor(dekade) {
+        dekade = floor(dekade / 10) * 10;
+        const rows = [];
+        for (let y = dekade; y < dekade + 10; ) {
+            let e = new Eclipse(y);
+            if (e.isValid() && e.info().jdeMax.toDate().getFullYear()>=dekade) {
+                rows.push(e);
+                y += 29.5 / 365.25;
+            } else {
+                y += 15 / 365.25;
+            }
+        }
+        this.rows = rows;
+    }
+}
 export default {
     calcBessel,
     generateBesselianElement,
     Eclipse,
+    EclipseDecade
 }

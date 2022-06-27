@@ -3,10 +3,11 @@
 </template>
 <script>
     import * as THREE from 'three';
-    //import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls.js';
     import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
     import {sincos} from 'astronomia/src/base';
     import {generateGIF} from '@/libs/gif-generator';
+    import vertexShader from '!raw-loader!./webgl/vertex.c';
+    import fragmentShader from '!raw-loader!./webgl/fragment.c';
 
     export default{
         props: {
@@ -14,8 +15,6 @@
                 type: [String, Object],
                 default: 'images/earth_1600.jpg',
             },
-            fragmentShader: String,
-            vertexShader: String,
             uniform: {
                 type: Object,
                 default() {
@@ -52,8 +51,8 @@
 
             var material = new THREE.ShaderMaterial({
                 uniforms: this.uniform,
-                vertexShader: this.vertexShader,
-                fragmentShader: this.fragmentShader,
+                vertexShader: vertexShader,
+                fragmentShader: fragmentShader,
             });
             var mesh = new THREE.Mesh(this.sphere, material);
             mesh.position.x = 0;

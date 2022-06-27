@@ -18,24 +18,46 @@
                             </button>
                             <input type="range" min="0" max="1000" style="width: 90%;" v-model.number="slider"/>
                         </div>
-                        <div class="col-6">
+                        <div class="col-12 col-lg-4">
                             <input type="range" min="20" max="100" style="width: 100%;" v-model.number="zoom"/>
                         </div>
-                        <div class="col-6">
+                        <div class="col-6 col-lg-4">
+                            <select class="form-control" v-model="options.model">
+                                <option value="se-globe">Globe</option>
+                                <option value="se-mercator">Mercator</option>
+                            </select>
+                        </div>
+                        <div class="col-6 col-lg-4" v-if="options.model=='se-globe'">
                             <div class="form-check">
                                 <input type="checkbox" class="form-check-input"  v-model="options.rotation" id="ck_rotation">
                                 <label class="form-check-label" for="ck_rotation">Rotasi</label>
                             </div>
                         </div>
                     </div>
-                    <a-globe ref="globe" :zoom="zoom" :control="!options.rotations"
-                             :uniform="uniform" :camera-pos="cameraPos"
-                             :vertex-shader="vertexShader" :fragment-shader="fragmentShader"
-                             ></a-globe>
+                    <div class="row">
+                        <div class="col-12">
+                            <component :is='options.model' ref="globe" :zoom="zoom" :control="!options.rotations"
+                                       :uniform="uniform" :camera-pos="cameraPos"
+                                       ></component>
+                        </div>
+                    </div>
                 </lte-card>
             </div>
             <div class="col-md-6 col-12">
-                <lte-card title="Besselian Element">
+                <lte-card title="Besselian Element" style="font-size: 14px;">
+                    <table class="table table-borderless">
+                        <tbody>
+                            <tr>
+                                <th width="90" >DeltaT</th>
+                                <td width="60" style="text-align: right;">{{info.deltaT.toFixed(2)}}</td>
+                                <td>&nbsp;</td>
+                            </tr>
+                            <tr>
+                                <th>T0</th>
+                                <td style="text-align: right;">{{info.T0}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
                     <table class="table table-bordered">
                         <tbody>
                             <tr style="text-align: center;">
@@ -48,6 +70,13 @@
                             <tr v-for="(vals,name) in series">
                                 <th style="text-align: center;">{{name}}</th>
                                 <td style="text-align: right;" v-for="v in vals">{{v}}</td>
+                            </tr>
+                            <tr>
+                                <th style="text-align: center;">tanF</th>
+                                <td></td>
+                                <td style="text-align: right;">{{info.tanF1.toFixed(8)}}</td>
+                                <td style="text-align: right;">{{info.tanF2.toFixed(8)}}</td>
+                                <td></td>
                             </tr>
                         </tbody>
                     </table>
@@ -70,11 +99,6 @@
     </lte-content>
 </template>
 <script>
-    import * as THREE from 'three';
-    import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls.js';
-    import vertexShader from '!raw-loader!./webgl/vertex.c';
-    import fragmentShader from '!raw-loader!./webgl/fragment.c';
-    //import {sincos, toRad} from 'astronomia/src/base';
     import {Eclipse} from '@/libs/solar-eclipse';
 
     const {sin, cos, tan, PI} = Math;
@@ -102,8 +126,6 @@
                     tanf1: {value: 0},
                     tanf2: {value: 0},
                 },
-                vertexShader: vertexShader,
-                fragmentShader: fragmentShader,
                 slider: 500,
                 cameraPos: {
                     lat: 0,
@@ -112,9 +134,7 @@
                 },
                 zoom: 100,
                 options: {
-                    sun: true,
-                    moon: true,
-                    line: true,
+                    model: 'se-globe',
                     rotation: true,
                 },
                 intervalID: null,
@@ -123,13 +143,14 @@
             }
         },
         mounted() {
-            this.update(this.$route.query.date);
+            this.update(this.$route.params.date);
+            this.slider++;
+            this.slider--;
         },
         methods: {
             update(date) {
                 this.eclipse = new Eclipse(date);
                 var info = this.eclipse.info();
-                //Object.assign(this.info, info);
                 this.info = info;
             },
             run() {
@@ -238,13 +259,17 @@
                     this.updatePath(this.bessel);
                 }
             },
-            '$route.query.date': function (date) {
+            '$route.params.date': function (date) {
                 this.update(date);
+                if (this.isValid) {
+                    this.slider = (this.slider == 500 ? 501 : 500);
+                    //this.updatePath(this.bessel);
+                }
             },
             'info.date': function () {
                 if (this.isValid) {
                     this.slider = (this.slider == 500 ? 501 : 500);
-                    this.updatePath(this.bessel);
+                    //this.updatePath(this.bessel);
                 }
             }
         }

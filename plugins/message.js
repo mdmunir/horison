@@ -11,11 +11,9 @@ BroadcastChannel.refreshState = function (name, state) {
 }
 
 export default function ( {store}) {
-    myChanel.addEventListener('message', ({data}) => {        
+    myChanel.addEventListener('message', ({data}) => {
         if (data && data.type == 'STORE_REFRESH' && data.id != MY_ID) {
             store.commit(data.name, data.state);
-        }
+    }
     });
-    
-    
 }

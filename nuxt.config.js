@@ -49,6 +49,7 @@ const m = {
 
     // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
     plugins: [
+        '@/plugins/sanitize.js',
         '@/plugins/format.js',
         '@/plugins/message.js',
         '@/plugins/sw-update.js',
@@ -59,6 +60,7 @@ const m = {
         '~/components',
         {path: '~/components/adminlte/', prefix: 'lte'},
         {path: '~/components/app/', prefix: 'a'},
+        {path: '~/components/app/se', prefix: 'se'},
     ],
 
     // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
