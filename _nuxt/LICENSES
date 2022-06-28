@@ -2,21 +2,6 @@
  * @copyright 2013 Sonia Keys
  * @copyright 2016 commenthol
  * @license MIT
- * @module eclipse
- */
-
-
-/**
- * @license
- * Copyright 2010-2022 Three.js Authors
- * SPDX-License-Identifier: MIT
- */
-
-
-/**
- * @copyright 2013 Sonia Keys
- * @copyright 2016 commenthol
- * @license MIT
  * @module coord
  */
 
@@ -92,29 +77,9 @@
 
 
 /**
- * @copyright 2013 Sonia Keys
- * @copyright 2016 commenthol
- * @license MIT
- * @module moonposition
- */
-
-
-/*!
-  * vue-router v3.5.3
-  * (c) 2021 Evan You
-  * @license MIT
-  */
-
-/*!
- * Vue.js v2.6.14
- * (c) 2014-2021 Evan You
- * Released under the MIT License.
- */
-
-/*!
- * vuex v3.6.2
- * (c) 2021 Evan You
- * @license MIT
+ * @license
+ * Copyright 2010-2022 Three.js Authors
+ * SPDX-License-Identifier: MIT
  */
 
 
@@ -122,7 +87,7 @@
  * @copyright 2013 Sonia Keys
  * @copyright 2016 commenthol
  * @license MIT
- * @module eclipse
+ * @module eqtime
  */
 
 
@@ -180,6 +145,41 @@
  * @copyright 2016 commenthol
  * @license MIT
  * @module solarxyz
+ */
+
+
+/**
+ * @copyright 2013 Sonia Keys
+ * @copyright 2016 commenthol
+ * @license MIT
+ * @module eclipse
+ */
+
+
+/**
+ * @copyright 2013 Sonia Keys
+ * @copyright 2016 commenthol
+ * @license MIT
+ * @module moonposition
+ */
+
+
+/*!
+  * vue-router v3.5.3
+  * (c) 2021 Evan You
+  * @license MIT
+  */
+
+/*!
+ * Vue.js v2.6.14
+ * (c) 2014-2021 Evan You
+ * Released under the MIT License.
+ */
+
+/*!
+ * vuex v3.6.2
+ * (c) 2021 Evan You
+ * @license MIT
  */
 
 
@@ -243,5 +243,5 @@
  * @copyright 2013 Sonia Keys
  * @copyright 2016 commenthol
  * @license MIT
- * @module eqtime
+ * @module eclipse
  */
