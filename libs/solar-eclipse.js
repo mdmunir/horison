@@ -112,7 +112,7 @@ export function generateBesselianElement(y, earth, elpMoon) {
         T0: floor(f * 24 + 0.5),
     }
     result.JDE0 = i + result.T0 / 24 - 0.5;
-    result.GST0 = sidereal.mean(result.JDE0);
+    result.GST0 = sidereal.mean(result.JDE0) / 86400 * 2 * PI; // rad
 
     const prev = {μ: 0, SRa: 0, MRa: 0};
     const series = {
@@ -136,12 +136,12 @@ export function generateBesselianElement(y, earth, elpMoon) {
         let sun = sunPos(earth, jde, Δψ, ε);
         let moon = moonPos(elpMoon, jde, Δψ, ε);
 
-        let gst = (result.GST0 + h * 1.00273790935 * 3600) / 86400 * 2 * PI;
+        let gst = (result.GST0 + h * 1.00273790935 * 2 * PI / 24);
         gst = base.pmod(gst + Δψ * cos(ε), 2 * PI);
 
         const element = calcBessel(sun, moon, gst);
 
-        while (element.μ < prev.M) {
+        while (element.μ < prev.μ) {
             element.μ += 2 * PI;
         }
         prev.μ = element.μ;
@@ -202,7 +202,7 @@ const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 const NUMBER_REGEX = /^\d+(\.\d+)?$/;
 export class Eclipse {
     constructor(date) {
-        let y,k, useDate = true;
+        let y, k, useDate = true;
         if (NUMBER_REGEX.test(date + '')) {
             y = date * 1;
             k = floor((y - 2000) * 12.3685 + 0.5);
@@ -237,7 +237,7 @@ export class Eclipse {
             }
             info.date = sdate;
             this._info = caches[k] = info;
-        }        
+        }
         let tMax = (info.jdeMax - info.JDE0) * 24;
 
         // get P1 and P4
@@ -292,7 +292,7 @@ export class EclipseDecade {
         const rows = [];
         for (let y = dekade; y < dekade + 10; ) {
             let e = new Eclipse(y);
-            if (e.isValid() && e.info().jdeMax.toDate().getFullYear()>=dekade) {
+            if (e.isValid() && e.info().jdeMax.toDate().getFullYear() >= dekade) {
                 rows.push(e);
                 y += 29.5 / 365.25;
             } else {

@@ -44,7 +44,7 @@
                 </lte-card>
             </div>
             <div class="col-md-6 col-12">
-                <lte-card title="Besselian Element" style="font-size: 14px;">
+                <lte-card title="Data Gerhana" style="font-size: 13px;">
                     <table class="table table-borderless">
                         <tbody>
                             <tr>
@@ -54,11 +54,11 @@
                             </tr>
                             <tr>
                                 <th>T0</th>
-                                <td style="text-align: right;">{{info.T0}}</td>
+                                <td style="text-align: right;">{{info.T0 <10?'0'+info.T0:info.T0}}:00</td>
                             </tr>
                         </tbody>
                     </table>
-                    <table class="table table-bordered">
+                    <table class="table table-bordered element">
                         <tbody>
                             <tr style="text-align: center;">
                                 <th>&nbsp;&nbsp;</th>
@@ -66,6 +66,9 @@
                                 <th>1</th>
                                 <th>2</th>
                                 <th>3</th>
+                            </tr>
+                            <tr>
+                                <th colspan="5"> Besselian Element</th>
                             </tr>
                             <tr v-for="(vals,name) in series">
                                 <th style="text-align: center;">{{name}}</th>
@@ -77,6 +80,37 @@
                                 <td style="text-align: right;">{{info.tanF1.toFixed(8)}}</td>
                                 <td style="text-align: right;">{{info.tanF2.toFixed(8)}}</td>
                                 <td></td>
+                            </tr>
+                            <tr>
+                                <th colspan="5">&nbsp;</th>
+                            </tr>
+                            <tr>
+                                <th colspan="5"> Posisi Matahari</th>
+                            </tr>
+                            <tr v-for="(vals,name) in sunMoon.sun">
+                                <th style="text-align: center;">{{name}}</th>
+                                <td style="text-align: right;" v-for="v in vals">{{v}}</td>
+                            </tr>
+                            <tr>
+                                <th colspan="5">&nbsp;</th>
+                            </tr>
+                            <tr>
+                                <th colspan="5"> Posisi Bulan</th>
+                            </tr>
+                            <tr v-for="(vals,name) in sunMoon.moon">
+                                <th style="text-align: center;">{{name}}</th>
+                                <td style="text-align: right;" v-for="v in vals">{{v}}</td>
+                            </tr>
+                            <tr>
+                                <th colspan="5">&nbsp;</th>
+                            </tr>
+                            <tr>
+                                <th colspan="5"> Lain-lain</th>
+                            </tr>
+                            <tr>
+                                <th style="text-align: center;">GST</th>
+                                <td style="text-align: right;">{{(info.GST0 * 180/Math.PI).toFixed(8)}}</td>
+                                <td style="text-align: right;">15.04106864</td>
                             </tr>
                         </tbody>
                     </table>
@@ -246,7 +280,31 @@
                     });
                 }
                 return result;
-            }
+            },
+            sunMoon() {
+                const series = ['ra', 'dec', 'range'];
+                const objs = ['sun', 'moon'];
+                const result = {};
+                if (this.isValid) {
+                    const info = this.info;
+                    objs.forEach(obj => {
+                        result[obj] = {};
+                        series.forEach(name => {
+                            let s = this.info[obj][name].slice(0, 4);
+                            if (name == 'ra' || name == 'dec') {
+                                s = s.map(v => v * 180 / Math.PI);
+                            }
+                            result[obj][name] = s.map((v, i) => {
+                                if (name == 'range' && i == 0) {
+                                    return v.toFixed(3);
+                                }
+                                return Math.abs(v) > 5e-8 ? v.toFixed(7) : ''
+                            });
+                        });
+                    });
+                }
+                return result;
+            },
         },
         watch: {
             'options.rotation': function (v) {
@@ -276,3 +334,8 @@
     }
 </script>
 
+<style>
+    table.element th{
+        margin-left: 5px;
+    }
+</style>
