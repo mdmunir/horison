@@ -5,7 +5,7 @@
                 <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
             </li>
             <li class="nav-item d-inline-block d-sm-none">
-            <NuxtLink to="/" class="nav-link">Home</nuxtlink>
+            <NuxtLink to="/" class="nav-link">Home</NuxtLink>
             </li>
         </ul>
         <ul class="navbar-nav ml-auto">

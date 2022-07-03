@@ -8,6 +8,7 @@ uniform float l1;
 uniform float l2;
 uniform float tanf1;
 uniform float tanf2;
+uniform int isAe;
 uniform sampler2D txtr;
 varying vec2 vUv;
 
@@ -15,6 +16,15 @@ void main(void){
     vec2 position = -1.0 + 2.0 * vUv;
     float lat = radians(position.y * 90.0);
     float lng = radians(position.x * 180.0);
+    vec2 pos = vec2(vUv.x, vUv.y);
+    if(isAe == 1){
+        float r = sqrt(position.y*position.y+position.x*position.x);
+        lat = radians(90.0 - 180.0*r);    
+        lng = atan(position.y,position.x);        
+        pos.x = lng / 3.14159 / 2.0 + 0.5;
+        pos.y = 1.0 - r;
+    }
+    
     float cosLat = cos(lat);
     float sinLat = sin(lat);
     float theta = mu + lng;
@@ -28,7 +38,7 @@ void main(void){
     float m = sqrt(u * u + v * v);
     float L1 = l1 - zeta * tanf1;
     float L2 = l2 - zeta * tanf2;
-    vec3 color = texture2D( txtr, vUv ).rgb;
+    vec3 color = texture2D(txtr, pos).rgb;
     if (zeta < 0.0){
         float fac = 0.4;
         gl_FragColor = vec4(color.x * fac, color.y * fac, color.z * fac, 1.0 );
