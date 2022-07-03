@@ -75,8 +75,8 @@ export class Hilal {
         let jam = floor((jde - this.T0) * 24) / 24;
         this.H0 = this.T0 + jam;
 
-        const BEGIN = jam - 1.25;
-        const END = jam + 2;
+        const BEGIN = -0.5;
+        const END = 2.5;
         this.begin = BEGIN + this.T0;
         this.end = END + this.T0;
 
@@ -137,7 +137,7 @@ export class Hilal {
      * @return {Object}
      */
     calc(g, day = 0, method) {
-        let jd = this.H0 + day;
+        let jd = this.T0 + day;
         // sun set.
         let alt = -50 / 60 * D2R;
         let sunSet = this.sunPolynom.rise(jd, g, alt, 1);
@@ -349,4 +349,26 @@ export class Aritmatic {
     }
 }
 
-export default {Hilal, Hijriah, Aritmatic, currentMonth, MONTHS}
+export function moonPhases(year) {
+    year = Math.floor(year);
+    let k = 12 * year - 17050;
+    const result = [];
+    for (let m = 1; m <= 12; m++) {
+        let y = (k + m) / 12.3685 + 2000;
+        const row = {
+            y:year,
+            m,
+            deltaT:deltaT(y),
+            phases:[
+                moonphase.newMoon(y),
+                moonphase.first(y),
+                moonphase.full(y),
+                moonphase.last(y),
+            ]
+        }
+        result.push(row);
+    }
+    return result;
+}
+
+export default {Hilal, Hijriah, Aritmatic, currentMonth, moonPhases, MONTHS}
