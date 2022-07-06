@@ -50,11 +50,12 @@
 </template>
 
 <script>
-    import {R2D, Globe} from '@/libs/horison';
+    import {R2D, D2R, Globe} from '@/libs/horison';
     import locations from '@/libs/location';
     import base from 'astronomia/src/base';
+    import rise from 'astronomia/src/rise';
 
-    const {floor} = Math;
+    const {floor, PI, sin, cos, asin, acos, atan, atan2} = Math;
     const METHOD = {
         alt: 'a',
         elongation: 'g'
@@ -67,6 +68,7 @@
         {key: 'zone', label: 'Timezone'},
         {key: 'date', label: 'Tanggal'},
         {key: 'sunSet', label: 'Sunset'},
+        {key: 'sunSet2', label: 'Sunset2'},
         {key: 'sunAz', label: 'Az Matahari'},
         {key: 'moonAz', label: 'Az Bulan'},
         {key: 'moonAlt', label: 'Alt Bulan'},
@@ -96,17 +98,34 @@
                 const method = this.method || {};
                 const hilal = this.hilal;
                 const result = [];
-                const d = this.day;
-                locations.forEach(loc => {
+                const d = Math.floor(this.day);
+                const fragment = hilal.fragment(d);
+                const T0 = fragment.T0;
+                
+                locations.forEach((loc) => {
                     let offset = parseFloat(loc.zone) * 60;
                     const g = Globe.fromLoc(loc);
                     const info = hilal.calc(g, d, method);
                     const sunSet = Date.fromJD(info.sunSet);
+                    let t = g.lon / (2 * PI) - fragment.eot;
+                    
+                    let delta = base.horner(t, fragment.SDec);
+                    let tHA = rise.hourAngle(g.lat, -0.833 * D2R, delta) / (2 * PI);
+                    t = t + tHA;
+                    let mHA = base.horner(t, fragment.MHa);
+                    let mDec = base.horner(t, fragment.MDec);
+                    let altM = asin(sin(mDec)*sin(g.lat) + cos(mDec)*cos(g.lat)*cos(mHA-g.lon));
+                    altM = altM - fragment.hp * cos(altM) + 34/60 * D2R;
+                    let sHA = base.horner(t, fragment.SHa);
+                    let sDec = base.horner(t, fragment.SDec);
+                    let altS = asin(sin(sDec)*sin(g.lat) + cos(sDec)*cos(g.lat)*cos(sHA-g.lon));
+                    altS = altS + 0.83 * D2R;
                     const row = {
                         name: loc.name, lat: loc.lat, lon: loc.lon,
                         zone: 'GMT' + loc.zone,
                         date: moment(sunSet).utcOffset(offset).format('YYYY-MM-DD'),
-                        sunSet: moment(sunSet).utcOffset(offset).format('HH:mm:ss'),
+                        sunSet: altS * R2D,
+                        sunSet2: (altM-altS) * R2D,
                         moonSet: moment(Date.fromJD(info.moonSet)).utcOffset(offset).format('HH:mm:ss'),
                         age: '-',
                         duration: '-',

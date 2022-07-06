@@ -1,10 +1,11 @@
 import base from 'astronomia/src/base';
 import moonphase from 'astronomia/src/moonphase';
 import angle from 'astronomia/src/angle';
+import eqtime from 'astronomia/src/eqtime';
 import {toHorizontal2, horizontalSep, deltaT} from './horison';
 import position from './position';
 
-const {PI, abs, atan, cos, floor} = Math;
+const {PI, abs, atan, cos, floor, asin} = Math;
 const D2R = PI / 180;
 const ERR = 1e-6;
 
@@ -71,7 +72,7 @@ export class Hilal {
 
         let jde = moonphase.newMoon(this.y);
         this.meeusConjunction = jde - this.deltaT / 86400;
-        this.T0 = floor(jde);
+        this.T0 = floor(jde + 0.5);
         let jam = floor((jde - this.T0) * 24) / 24;
         this.H0 = this.T0 + jam;
 
@@ -129,6 +130,24 @@ export class Hilal {
         };
     }
 
+    fragment(day = 0) {
+        const T0 = this.T0 + day;
+        const solar = new position.Solar(true, 3);
+        const moon = new position.Moon(true, 3);
+        const sunPolynom = solar.polynom(T0, -0.6, 0.8);
+        const moonPolynom = moon.polynom(T0, -0.6, 0.8);
+        const result = {
+            T0: T0,
+            SHa: sunPolynom.POLYNOM.GHA,
+            SDec: sunPolynom.POLYNOM.Dec,
+            MHa: moonPolynom.POLYNOM.GHA,
+            MDec: moonPolynom.POLYNOM.Dec,
+            eot: eqtime.eSmart(T0) / (2 * PI),
+            hp: asin(6378.137 / moonPolynom.POLYNOM.R[0]),
+        };
+        return result;
+    }
+
     /**
      * 
      * @param {Object} g globe coordinate
@@ -137,7 +156,7 @@ export class Hilal {
      * @return {Object}
      */
     calc(g, day = 0, method) {
-        let jd = this.T0 + day;
+        let jd = this.T0 + day + g.lon/(2*PI);
         // sun set.
         let alt = -50 / 60 * D2R;
         let sunSet = this.sunPolynom.rise(jd, g, alt, 1);
@@ -356,10 +375,10 @@ export function moonPhases(year) {
     for (let m = 1; m <= 12; m++) {
         let y = (k + m) / 12.3685 + 2000;
         const row = {
-            y:year,
+            y: year,
             m,
-            deltaT:deltaT(y),
-            phases:[
+            deltaT: deltaT(y),
+            phases: [
                 moonphase.newMoon(y),
                 moonphase.first(y),
                 moonphase.full(y),

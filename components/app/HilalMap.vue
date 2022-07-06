@@ -5,8 +5,8 @@
     import * as THREE from 'three';
     import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
     import {sincos} from 'astronomia/src/base';
-    import {generateGIF} from '@/libs/gif-generator';
-    import vertexShader from '!raw-loader!./webgl/se-vertex.c';
+    import {getImage} from '@/libs/gif-generator';
+    import vertexShader from '!raw-loader!./webgl/vertex.c';
     import fragmentShader from '!raw-loader!./webgl/hilal-fragment.c';
 
     export default{
@@ -31,7 +31,7 @@
             },
         },
         data() {
-            var padding = 0.05;
+            var padding = 0.01;
             const models = {
                 globe: new THREE.SphereGeometry(1, 128, 64),
                 mer: new THREE.PlaneGeometry(2, 2),
@@ -78,21 +78,19 @@
             controls.rotateSpeed = 1.0;
             controls.zoomSpeed = 1.2;
             controls.panSpeed = 0.8;
-            controls.noZoom = true;
-            controls.enableZoom = false;
-            controls.enablePan = false;
-            controls.noPan = true;
+            controls.enableZoom = true;
+            controls.enablePan = true;
             controls.staticMoving = true;
             controls.dynamicDampingFactor = 0.3;
             controls.keys = [65, 83, 68];
             controls.autoRotate = false;
-            controls.enableZoom = false;
-            controls.enablePan = false;
             controls.keys = [65, 83, 68];
+            controls.minZoom = 1;
+            controls.maxZoom = 5;
             controls.addEventListener('change', function () {
                 th.render();
             });
-            controls.enabled = this.control && this.type == 'globe';
+            controls.enableRotate = (this.type == 'globe');
         },
         methods: {
             render() {
@@ -124,24 +122,12 @@
                     th.doScale(th.scale);
                 }, time);
             },
-            async download(callback, options = {}) {
-                var th = this;
-                this.animated = false;
-                var buffer = await generateGIF(this.renderer.domElement, function (progress) {
-                    if (callback) {
-                        if (callback(progress) === false) {
-                            return false;
-                        }
-                    }
-                    th.render();
-                }, options);
-                const blob = new Blob([buffer], {type: 'image/gif'});
-                this.animated = true;
-
+            download(options = {}) {
                 const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = options.filename || 'solar-eclipse.gif';
-                link.dispatchEvent(new MouseEvent('click'));
+                this.render();
+                link.href = this.renderer.domElement.toDataURL();
+                link.download = options.filename || 'peta-tinggi-hilal.png';
+                link.click();
             }
         },
         watch: {
@@ -152,7 +138,7 @@
             type(v) {
                 this.mesh.geometry = this.models[v];
                 this.doScale(this.scale);
-                this.controls.enabled = this.control && v == 'globe';
+                this.controls.enableRotate = (v == 'globe');
                 if (v != 'globe') {
                     this.camera.position.set(0, 0, 4);
                 }

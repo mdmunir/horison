@@ -61,7 +61,7 @@
                 const children = [
                     {name: '', label: 'Info'},
                     {name: 'id', label: 'Wilayah Indonesia'},
-                        //{name: 'path', label: 'Path'},
+                    {name: 'map', label: 'Peta'},
                 ];
                 let name = this.$route.name;
                 let month = this.$route.params.month;

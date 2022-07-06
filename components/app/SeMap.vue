@@ -6,7 +6,7 @@
     import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
     import {sincos} from 'astronomia/src/base';
     import {generateGIF} from '@/libs/gif-generator';
-    import vertexShader from '!raw-loader!./webgl/se-vertex.c';
+    import vertexShader from '!raw-loader!./webgl/vertex.c';
     import fragmentShader from '!raw-loader!./webgl/se-fragment.c';
 
     export default{
