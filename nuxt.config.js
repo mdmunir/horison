@@ -19,24 +19,9 @@ const m = {
         link: [
             {rel: 'icon', type: 'image/x-icon', href: `${DEPLOY_PATH}favicon.ico`},
             {rel: 'stylesheet', href: 'https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700'},
-            {rel: 'stylesheet', href: `${DEPLOY_PATH}plugins/fontawesome-free/css/all.min.css`},
             {rel: 'stylesheet', href: 'https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css'},
-            {rel: 'stylesheet', href: `${DEPLOY_PATH}plugins/icheck-bootstrap/icheck-bootstrap.min.css`},
-            {rel: 'stylesheet', href: `${DEPLOY_PATH}plugins/select2/css/select2.min.css`},
-            {rel: 'stylesheet', href: `${DEPLOY_PATH}plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css`},
-            {rel: 'stylesheet', href: `${DEPLOY_PATH}dist/css/adminlte.min.css`},
-            {rel: 'stylesheet', href: `${DEPLOY_PATH}plugins/overlayScrollbars/css/OverlayScrollbars.min.css`},
-            //{rel: 'stylesheet', href: `${DEPLOY_PATH}plugins/daterangepicker/daterangepicker.css`},
         ],
         script: [
-            {src: `${DEPLOY_PATH}plugins/jquery/jquery.min.js`, body: true},
-            //{src: `${DEPLOY_PATH}plugins/jquery-ui/jquery-ui.min.js`, body: true},
-            {src: `${DEPLOY_PATH}plugins/bootstrap/js/bootstrap.bundle.min.js`, body: true},
-            {src: `${DEPLOY_PATH}plugins/select2/js/select2.full.min.js`, body: true},
-//            {src: `${DEPLOY_PATH}plugins/moment/moment.min.js`, body: true},
-//            {src: `${DEPLOY_PATH}plugins/moment/locales.min.js`, body: true},
-            {src: `${DEPLOY_PATH}dist/js/adminlte.js`, body: true},
-            {src: 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js', body:true},
         ],
         bodyAttrs: {
             class: 'hold-transition sidebar-mini layout-fixed layout-navbar-fixedx layout-footer-fixed'
@@ -49,10 +34,9 @@ const m = {
 
     // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
     plugins: [
-        '@/plugins/sanitize.js',
+        '@/libs/main.js',
         '@/plugins/format.js',
         '@/plugins/message.js',
-        '@/plugins/sw-update.js',
     ],
 
     // Auto import components: https://go.nuxtjs.dev/config-components

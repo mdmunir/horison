@@ -1,6 +1,4 @@
 import julian from 'astronomia/src/julian';
-import moment from 'moment';
-import 'moment/locale/id';
 
 //
 //console.log(' window moment');
@@ -8,9 +6,6 @@ const {abs, floor, round, random} = Math;
 const T0_GREGORIAN = -12219292800000; //1582-10-15
 const JD0_GREGORIAN = 2299160.5;
 const MS_DAY = 86400000;
-
-moment.locale('id');
-window.moment = moment;
 
 const ZONE_REGEX1 = /(\d+:\d+(:[\d\.]+)?)\s*(GMT|UTC|Z)?((\+|-)(\d\d:?\d\d))$/
 const ZONE_REGEX2 = /(\d+:\d+(:[\d\.]+)?)\s*(GMT|UTC|Z)$/
