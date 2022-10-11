@@ -2,6 +2,7 @@ import base from 'astronomia/src/base';
 import moonphase from 'astronomia/src/moonphase';
 import angle from 'astronomia/src/angle';
 import eqtime from 'astronomia/src/eqtime';
+import interpolation from 'astronomia/src/interpolation';
 import {toHorizontal2, horizontalSep, deltaT} from './horison';
 import position from './position';
 
@@ -44,6 +45,114 @@ export function currentMonth() {
 }
 
 const hilalCaches = {};
+
+const ORDE = 3;
+const solar = new position.Solar(true, ORDE);
+const moon = new position.Moon(true, ORDE);
+const hilalCaches2 = {};
+
+export class Hilal2 {
+    constructor(year, month) {
+        year = floor(year);
+        month = floor(month);
+        let K = 12 * year + month - 17050;
+        if (hilalCaches2[K]) {
+            this._data = hilalCaches2[K];
+            return;
+        }
+        let y = K / 12.3685 + 2000;
+        let delatT = deltaT(y);
+        const data = {
+            year, month, y,
+            deltaT,
+            meeus: moonphase.newMoon(y) - delatT / 86400,
+            polynoms: {},
+        };
+        hilalCaches2[K] = this._data = data;
+
+        data.T0 = floor(data.meeus + 0.5);
+        const H0 = floor((data.meeus - data.T0) * 24) + data.T0;
+        const conjunction = [
+            {
+                T: H0,
+                sun: solar.calc(H0).lon,
+                moon: moon.calc(H0).lon,
+            },
+            {
+                T: H0 + 1 / 24,
+                sun: solar.calc(H0 + 1 / 24).lon,
+                moon: moon.calc(H0 + 1 / 24).lon,
+            },
+        ]
+        data.conjunction = conjunction;
+    }
+
+    polynom(day = 0) {
+        day = floor(day);
+        if (this._data.polynoms[d]) {
+            return this._data.polynoms[d];
+        }
+        const T0 = this._data.T0 + day;
+
+        const BEGIN = -12 / 24;
+        const END = 36 / 24;
+        const sunPolynom = solar.polynom(T0, BEGIN, END);
+        const moonPolynom = moon.polynom(T0, BEGIN, END);
+
+        const result = {
+            T0: T0,
+            sun: {...sunPolynom.POLYNOM},
+            moon: {...moonPolynom.POLYNOM},
+            hp: asin(6378.137 / moonPolynom.POLYNOM.R[0]),
+        };
+        return this._data.polynoms[d] = result;
+    }
+
+    /**
+     * 
+     * @param {Object} g globe coordinate
+     * @param {Number} day 
+     * @param {Object} method 
+     * @return {Object}
+     */
+    calc(g, day = 0, method) {
+        day = floor(day);
+        const polynom = this.polynom(day);
+        let t = g.lon / (2 * PI), lha, dec, H0, dt, cosHa;
+        let alt = -50 / 60 * D2R;
+        let valid = true;
+        for (let it = 0; it < 3; it++) {
+            dec = base.horner(t, polynom.sun.Dec);
+            lha = base.pmod(base.horner(t, polynom.sun.GHA) - g.lon, 2 * PI);
+            cosHa = (alt - sin(g.lat) * sin(dec)) / (cos(g.lat) * cos(dec));
+            if (cosHa > -1 && cosHa < 1) {
+                H0 = acos(cosHa);
+                dt = (H0 - lha) / (2 * PI);
+                if (it == 1) {
+                    dt = base.pmod(dt, 1);
+                }
+                t += dt;
+            } else {
+                valid = false;
+                break;
+            }
+        }
+        if (!valid) {
+            return {sunset: -1};
+        }
+        const sun = {
+            lha, dec,
+            ...horison.toHorizontal2({gha: lha + g.lon, dec}, g),
+        };
+        
+        const result = {
+            sunset: polynom.T0 + t,
+
+        };
+        cos(t);
+    }
+
+}
 
 export class Hilal {
 
@@ -132,10 +241,19 @@ export class Hilal {
 
     fragment(day = 0) {
         const T0 = this.T0 + day;
-        const solar = new position.Solar(true, 3);
-        const moon = new position.Moon(true, 3);
-        const sunPolynom = solar.polynom(T0, -0.6, 0.8);
-        const moonPolynom = moon.polynom(T0, -0.6, 0.8);
+        const BEGIN = -13 / 24;
+        const END = 24 / 24;
+        const ORDE = 3;
+        const solar = new position.Solar(true, ORDE);
+        const moon = new position.Moon(true, ORDE);
+        const sunPolynom = solar.polynom(T0, BEGIN, END);
+        const moonPolynom = moon.polynom(T0, BEGIN, END);
+        const eots = [];
+        for (let i = 0; i <= ORDE; i++) {
+            let x = i / ORDE * (END - BEGIN) + BEGIN;
+            let jde = T0 + x + this.deltaT / 86400;
+            eots.push([x, eqtime.eSmart(jde) / (2 * PI)]);
+        }
         const result = {
             T0: T0,
             SHa: sunPolynom.POLYNOM.GHA,
@@ -143,6 +261,7 @@ export class Hilal {
             MHa: moonPolynom.POLYNOM.GHA,
             MDec: moonPolynom.POLYNOM.Dec,
             eot: eqtime.eSmart(T0) / (2 * PI),
+            EqTime: interpolation.lagrangePoly(eots),
             hp: asin(6378.137 / moonPolynom.POLYNOM.R[0]),
         };
         return result;
@@ -156,7 +275,7 @@ export class Hilal {
      * @return {Object}
      */
     calc(g, day = 0, method) {
-        let jd = this.T0 + day + g.lon/(2*PI);
+        let jd = this.T0 + day + g.lon / (2 * PI);
         // sun set.
         let alt = -50 / 60 * D2R;
         let sunSet = this.sunPolynom.rise(jd, g, alt, 1);

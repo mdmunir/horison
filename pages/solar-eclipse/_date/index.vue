@@ -2,22 +2,20 @@
     <div class="row">
         <div class="col-md-6 col-12">
             <lte-card title="Polinomial Gerhana" style="font-size: 13px;">
-                <table class="table table-borderless">
+                <table class="table table-bordered element">
                     <tbody>
                         <tr>
-                            <th width="90" >DeltaT</th>
-                            <td width="60" style="text-align: right;">{{info.deltaT.toFixed(2)}}</td>
-                            <td>&nbsp;</td>
+                            <th>DeltaT</th>
+                            <td>{{info.deltaT.toFixed(2)}}</td>
                         </tr>
                         <tr>
                             <th>T0</th>
-                            <td style="text-align: right;">{{info.T0 <10?'0'+info.T0:info.T0}}:00</td>
+                            <td >{{info.T0 <10?'0'+info.T0:info.T0}}:00</td>
                         </tr>
-                    </tbody>
-                </table>
-                <table class="table table-bordered element">
-                    <tbody>
-                        <tr style="text-align: center;">
+                        <tr>
+                            <th colspan="5">&nbsp;</th>
+                        </tr>
+                        <tr >
                             <th>&nbsp;&nbsp;</th>
                             <th>0</th>
                             <th>1</th>
@@ -28,14 +26,14 @@
                             <th colspan="5"> Besselian Element</th>
                         </tr>
                         <tr v-for="(vals,name) in series">
-                            <th style="text-align: center;">{{name}}</th>
-                            <td style="text-align: right;" v-for="v in vals">{{v}}</td>
+                            <th >{{name}}</th>
+                            <td  v-for="v in vals">{{v}}</td>
                         </tr>
                         <tr>
-                            <th style="text-align: center;">tanF</th>
+                            <th >tanF</th>
                             <td></td>
-                            <td style="text-align: right;">{{info.tanF1.toFixed(8)}}</td>
-                            <td style="text-align: right;">{{info.tanF2.toFixed(8)}}</td>
+                            <td >{{info.tanF1.toFixed(8)}}</td>
+                            <td >{{info.tanF2.toFixed(8)}}</td>
                             <td></td>
                         </tr>
                         <tr>
@@ -45,8 +43,8 @@
                             <th colspan="5"> Posisi Matahari</th>
                         </tr>
                         <tr v-for="(vals,name) in sunMoon.sun">
-                            <th style="text-align: center;">{{name}}</th>
-                            <td style="text-align: right;" v-for="v in vals">{{v}}</td>
+                            <th >{{name}}</th>
+                            <td  v-for="v in vals">{{v}}</td>
                         </tr>
                         <tr>
                             <th colspan="5">&nbsp;</th>
@@ -55,8 +53,8 @@
                             <th colspan="5"> Posisi Bulan</th>
                         </tr>
                         <tr v-for="(vals,name) in sunMoon.moon">
-                            <th style="text-align: center;">{{name}}</th>
-                            <td style="text-align: right;" v-for="v in vals">{{v}}</td>
+                            <th >{{name}}</th>
+                            <td  v-for="v in vals">{{v}}</td>
                         </tr>
                         <tr>
                             <th colspan="5">&nbsp;</th>
@@ -65,9 +63,9 @@
                             <th colspan="5"> Lain-lain</th>
                         </tr>
                         <tr>
-                            <th style="text-align: center;">GST</th>
-                            <td style="text-align: right;">{{(info.GST0 * 180/Math.PI).toFixed(8)}}</td>
-                            <td style="text-align: right;">15.04106864</td>
+                            <th >GST</th>
+                            <td >{{(info.GST0 * 180/Math.PI).toFixed(8)}}</td>
+                            <td >15.04106864</td>
                         </tr>
                     </tbody>
                 </table>
@@ -129,3 +127,14 @@
         },
     }
 </script>
+<style>
+    table.element th{
+        text-align: center;
+    }
+    table.element th[colspan]{
+        text-align: left;
+    }
+    table.element td{
+        text-align: right;
+    }
+</style>

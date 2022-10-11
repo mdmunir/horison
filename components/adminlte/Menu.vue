@@ -25,23 +25,21 @@
     </ul>
 </template>
 <script>
-    function _isChildActive(items, path) {
-        let active = false;
-        for (let i in items) {
-            if ((items[i].url && items[i].url == path) || (items[i].children && _isChildActive(items[i].children, path))) {
-                active = true;
-                break;
+    function isActive(item, route){
+        let active = item.url == route.path
+            || (item.name && item.name==route.name)
+            || (item.names && item.names.includes(route.name));
+        if(!active && item.children){
+            for(let i in item.children){
+                if(isActive(item.children[i], route)){
+                    return true;
+                }
             }
         }
         return active;
     }
 
     export default {
-        computed: {
-            isChildActive() {
-                return _isChildActive(this.items, this.$route.path);
-            }
-        },
         props: ['items'],
         methods: {
             isExternalLink(url) {
@@ -51,8 +49,7 @@
                 return typeof item !== 'object';
             },
             isActive(item) {
-                return (item.url == this.$route.path) ||
-                    (item.children && _isChildActive(item.children, this.$route.path));
+                return isActive(item, this.$route);
             },
         },
     }

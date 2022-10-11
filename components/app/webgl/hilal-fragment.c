@@ -3,6 +3,7 @@ uniform float SHa[orde];
 uniform float SDec[orde];
 uniform float MHa[orde];
 uniform float MDec[orde];
+uniform float EqTime[orde];
 uniform float hp;
 uniform float eot;
 uniform float elongation; // derajat
@@ -40,7 +41,8 @@ void main(void){
     float lng = radians(-position.x * 180.0);
     vec3 color = texture2D(txtr, vUv).rgb;
     
-    float t = lng/(2.0*pi) - eot;
+    float t = lng/(2.0*pi);
+    t = t - horner(t, EqTime);
     float delta = horner(t, SDec);
     float cosHa = (-0.014538081 - sin(lat)*sin(delta))/(cos(lat)*cos(delta));
     float fac = 0.2;
@@ -63,19 +65,18 @@ void main(void){
         float cosElo = sin(sun.alt)*sin(moon.alt) + cos(sun.alt)*cos(moon.alt) * cos(sun.az - moon.az);
         float elo = acos(cosElo) * R2D;
 
-        if(alt > 0.0) {
-            //fac = (alt < 10.0) ? (0.08 * alt + 0.2) : 1.0;
-            fac = 1.0;
-        }else{
-            fac = 0.4;
-        }
-        if(alt > 0.0 && abs(elo-elongation) < ER * 0.5){
+        if(alt > altitude && abs(elo-elongation) < ER * 0.5){
             gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0 );
-        }else if(alt >= 0.0 && alt < 10.1 && fract(alt) < ER){
+        }else if(alt >= 0.0 && fract(alt) < ER){
             gl_FragColor = vec4(0.8, 0.8, 0.0, 1.0 );
-        }else {            
+        }else if(alt > altitude && elo > elongation) {
+            gl_FragColor = vec4(color.x, color.y, color.z, 1.0 );
+        }else if(alt > 0.0){
+            gl_FragColor = vec4(color.x, color.y * 0.5, color.z * 0.5, 1.0 );
+        }else{
+            fac = 0.3;
             gl_FragColor = vec4(color.x * fac, color.y * fac, color.z * fac, 1.0 );
-        }        
+        }
     }else{
         gl_FragColor = vec4(color.x * fac, color.y * fac, color.z * fac, 1.0 );
     }

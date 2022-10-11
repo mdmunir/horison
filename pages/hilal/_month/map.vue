@@ -3,6 +3,11 @@
         <div class="col-12">
             <lte-card @resize="$refs.map.resize(300)">
                 <template #tools>
+                    <ul class="pagination pagination-sm float-left">
+                        <li class="page-item" v-for="d in 3" :class="{'active':day == (d-2)}">
+                            <a href="javascript:void(0)" class="page-link" @click="day = (d-2)">{{d-2}}</a>
+                        </li>
+                    </ul>
                     <button class="btn btn-tool" @click="simpan">
                         <i class="fas fa-save"></i>
                     </button>
@@ -61,16 +66,18 @@
                     SDec: {value: [0]},
                     MHa: {value: [0]},
                     MDec: {value: [0]},
+                    EqTime: {value: [0]},
                 },
                 scale: 100,
                 model: 'mer',
-                save:{
-                    progress:0,
-                }
+                save: {
+                    progress: 0,
+                },
+                day:0,
             }
         },
         mounted() {
-            this.updateDay(0);
+            this.updateDay(this.day);
         },
         methods: {
             updateDay(day) {
@@ -82,9 +89,15 @@
                 uniforms2.SDec.value = fragment.SDec;
                 uniforms2.MHa.value = fragment.MHa;
                 uniforms2.MDec.value = fragment.MDec;
+                uniforms2.EqTime.value = fragment.EqTime;
             },
-            simpan(){
-                this.$refs.map.download({filename:`peta-hilal-${this.monthName}.png`});
+            simpan() {
+                this.$refs.map.download({filename: `peta-hilal-${this.monthName}.png`});
+            }
+        },
+        watch:{
+            day(v){
+                this.updateDay(v);
             }
         },
     }

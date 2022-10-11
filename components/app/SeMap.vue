@@ -85,21 +85,16 @@
             controls.rotateSpeed = 1.0;
             controls.zoomSpeed = 1.2;
             controls.panSpeed = 0.8;
-            controls.noZoom = true;
             controls.enableZoom = false;
             controls.enablePan = false;
-            controls.noPan = true;
             controls.staticMoving = true;
             controls.dynamicDampingFactor = 0.3;
             controls.keys = [65, 83, 68];
             controls.autoRotate = false;
-            controls.enableZoom = false;
-            controls.enablePan = false;
-            controls.keys = [65, 83, 68];
             controls.addEventListener('change', function () {
                 th.render();
             });
-            controls.enabled = this.control && this.type == 'globe';
+            controls.enableRotate = this.control && this.type == 'globe';
         },
         methods: {
             render() {
@@ -163,6 +158,9 @@
                     const [slat, clat] = sincos(v.lat || 0);
                     const r = v.distance || 4;
                     this.camera.position.set(r * clat * clon, r * slat, r * clat * slon);
+                    if (this.controls) {
+                        this.controls.update();
+                    }
                     this.render();
                 }
             },
@@ -174,14 +172,14 @@
                 this.mesh.geometry = this.models[v];
                 this.uniform.isAe.value = (v == 'ae' ? 1 : 0);
                 this.doScale(this.scale);
-                this.controls.enabled = this.control && v == 'globe';
+                this.controls.enableRotate = this.control && v == 'globe';
                 if (v != 'globe') {
                     this.camera.position.set(0, 0, 4);
                 }
                 this.render();
             },
             control(v) {
-                this.controls.enabled = (v && this.type == 'globe');
+                this.controls.enableRotate = (v && this.type == 'globe');
                 this.render();
             }
         }

@@ -2,20 +2,11 @@
     <div>
         <lte-card buttons="collapse">
             <div class="row">
-                <div class="col-md-4 col-sm-6 col-12">
-                    <div class="form-horizontal">
-                        <div class="form-group row">
-                            <label for="day" class="col-4 col-form-label">Tanggal</label>
-                            <div class="col-8">
-                                <select class="form-control" id="day" v-model="day">
-                                    <option :value="0">0</option>
-                                    <option :value="1">1</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <label for="altitude" class="col-4 col-form-label">Altitude</label>
-                            <div class="col-8">
+                <div class="col-12 col-md-6">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="altitude">Altitude</label>
                                 <select class="form-control" id="altitude" v-model="method.alt">
                                     <option value="g">Geosentris</option>
                                     <option value="t">Toposentris</option>
@@ -25,9 +16,9 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="form-group row">
-                            <label for="elongation" class="col-4 col-form-label">Elongation</label>
-                            <div class="col-8">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="elongation">Elongation</label>
                                 <select class="form-control" id="elongation" v-model="method.elongation">
                                     <option value="g">Geosentris</option>
                                     <option value="t">Toposentris</option>
@@ -40,6 +31,11 @@
         </lte-card>
         <lte-card>
             <template #tools>
+                <ul class="pagination pagination-sm float-left">
+                    <li class="page-item" v-for="d in 3" :class="{'active':day == (d-2)}">
+                        <a href="javascript:void(0)" class="page-link" @click="day = (d-2)">{{d-2}}</a>
+                    </li>
+                </ul>
                 <a v-if="rows.length" class="btn btn-tool" :href="contentDownload" download="hilal-wilayah-indonesia.txt">
                     <i class="fas fa-save"></i>
                 </a>
@@ -68,7 +64,6 @@
         {key: 'zone', label: 'Timezone'},
         {key: 'date', label: 'Tanggal'},
         {key: 'sunSet', label: 'Sunset'},
-        {key: 'sunSet2', label: 'Sunset2'},
         {key: 'sunAz', label: 'Az Matahari'},
         {key: 'moonAz', label: 'Az Bulan'},
         {key: 'moonAlt', label: 'Alt Bulan'},
@@ -99,33 +94,17 @@
                 const hilal = this.hilal;
                 const result = [];
                 const d = Math.floor(this.day);
-                const fragment = hilal.fragment(d);
-                const T0 = fragment.T0;
-                
+
                 locations.forEach((loc) => {
                     let offset = parseFloat(loc.zone) * 60;
                     const g = Globe.fromLoc(loc);
                     const info = hilal.calc(g, d, method);
                     const sunSet = Date.fromJD(info.sunSet);
-                    let t = g.lon / (2 * PI) - fragment.eot;
-                    
-                    let delta = base.horner(t, fragment.SDec);
-                    let tHA = rise.hourAngle(g.lat, -0.833 * D2R, delta) / (2 * PI);
-                    t = t + tHA;
-                    let mHA = base.horner(t, fragment.MHa);
-                    let mDec = base.horner(t, fragment.MDec);
-                    let altM = asin(sin(mDec)*sin(g.lat) + cos(mDec)*cos(g.lat)*cos(mHA-g.lon));
-                    altM = altM - fragment.hp * cos(altM) + 34/60 * D2R;
-                    let sHA = base.horner(t, fragment.SHa);
-                    let sDec = base.horner(t, fragment.SDec);
-                    let altS = asin(sin(sDec)*sin(g.lat) + cos(sDec)*cos(g.lat)*cos(sHA-g.lon));
-                    altS = altS + 0.83 * D2R;
                     const row = {
                         name: loc.name, lat: loc.lat, lon: loc.lon,
                         zone: 'GMT' + loc.zone,
                         date: moment(sunSet).utcOffset(offset).format('YYYY-MM-DD'),
-                        sunSet: altS * R2D,
-                        sunSet2: (altM-altS) * R2D,
+                        sunSet: moment(sunSet).utcOffset(offset).format('HH:mm:ss'),
                         moonSet: moment(Date.fromJD(info.moonSet)).utcOffset(offset).format('HH:mm:ss'),
                         age: '-',
                         duration: '-',
