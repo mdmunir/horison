@@ -2,6 +2,14 @@
  * @copyright 2013 Sonia Keys
  * @copyright 2016 commenthol
  * @license MIT
+ * @module eqtime
+ */
+
+
+/**
+ * @copyright 2013 Sonia Keys
+ * @copyright 2016 commenthol
+ * @license MIT
  * @module moonposition
  */
 
@@ -16,21 +24,6 @@
  * vuex v3.6.2
  * (c) 2021 Evan You
  * @license MIT
- */
-
-
-/**
- * @copyright 2013 Sonia Keys
- * @copyright 2016 commenthol
- * @license MIT
- * @module eclipse
- */
-
-
-/**
- * @license
- * Copyright 2010-2022 Three.js Authors
- * SPDX-License-Identifier: MIT
  */
 
 
@@ -88,6 +81,29 @@
  * @copyright 2016 commenthol
  * @license MIT
  * @module solarxyz
+ */
+
+
+/**
+ * @license
+ * Copyright 2010-2022 Three.js Authors
+ * SPDX-License-Identifier: MIT
+ */
+
+
+/**
+ * @copyright 2013 Sonia Keys
+ * @copyright 2016 commenthol
+ * @license MIT
+ * @module eclipse
+ */
+
+
+/**
+ * @copyright 2013 Sonia Keys
+ * @copyright 2016 commenthol
+ * @license MIT
+ * @module eqtime
  */
 
 
@@ -287,14 +303,6 @@
 //! moment.js
 
 //! moment.js locale configuration
-
-
-/**
- * @copyright 2013 Sonia Keys
- * @copyright 2016 commenthol
- * @license MIT
- * @module eqtime
- */
 
 
 /**
