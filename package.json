@@ -1,39 +1,41 @@
 {
-  "name": "horison",
-  "version": "1.0.0",
-  "private": true,
-  "scripts": {
-    "dev": "nuxt",
-    "build": "nuxt build",
-    "start": "nuxt start",
-    "generate": "nuxt generate",
-    "precache": "node nii precache",
-    "test": "jest"
-  },
-  "dependencies": {
-    "@nuxtjs/pwa": "^3.3.5",
-    "admin-lte": "^3.1",
-    "astronomia": "^4.0.1",
-    "core-js": "^3.19.3",
-    "dexie": "^3.2.0",
-    "jspdf": "^2.5.1",
-    "moment": "^2.29.3",
-    "nuxt": "^2.15.8",
-    "omggif": "^1.0.10",
-    "portal-vue": "^2.1.7",
-    "raw-loader": "^4.0.2",
-    "three": "^0.141.0",
-    "vue": "^2.6.14",
-    "vue-server-renderer": "^2.6.14",
-    "vue-template-compiler": "^2.6.14",
-    "webpack": "^4.46.0"
-  },
-  "devDependencies": {
-    "@vue/test-utils": "^1.3.0",
-    "babel-core": "7.0.0-bridge.0",
-    "babel-jest": "^27.4.4",
-    "jest": "^27.4.4",
-    "serialize-to-module": "^1.1.0",
-    "vue-jest": "^3.0.4"
-  }
+    "name": "horison",
+    "version": "1.0.0",
+    "private": true,
+    "scripts": {
+        "dev": "nuxt",
+        "build": "nuxt build",
+        "start": "nuxt start",
+        "generate": "nuxt generate",
+        "precache": "node nii precache",
+        "test": "jest"
+    },
+    "dependencies": {
+        "@nuxtjs/pwa": "^3.3.5",
+        "admin-lte": "^3.1",
+        "astronomia": "^4.0.1",
+        "core-js": "^3.19.3",
+        "dexie": "^3.2.0",
+        "expose-loader": "^0.7.3",
+        "jquery": "^3.1.1",
+        "jspdf": "^2.5.1",
+        "moment": "^2.29.3",
+        "nuxt": "^2.15.8",
+        "omggif": "^1.0.10",
+        "portal-vue": "^2.1.7",
+        "raw-loader": "^4.0.2",
+        "three": "^0.141.0",
+        "vue": "^2.6.14",
+        "vue-server-renderer": "^2.6.14",
+        "vue-template-compiler": "^2.6.14",
+        "webpack": "^4.46.0"
+    },
+    "devDependencies": {
+        "@vue/test-utils": "^1.3.0",
+        "babel-core": "7.0.0-bridge.0",
+        "babel-jest": "^27.4.4",
+        "jest": "^27.4.4",
+        "serialize-to-module": "^1.1.0",
+        "vue-jest": "^3.0.4"
+    }
 }
