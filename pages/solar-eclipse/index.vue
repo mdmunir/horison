@@ -101,7 +101,7 @@
                         stime: moment(date).utc().format('dddd, D MMMM YYYY,  HH:mm:ss [UT]'),
                         date: sdate,
                         stype: types[info.type],
-                        link: {path: `/solar-eclipse/${sdate}/path`},
+                        link: {path: `/solar-eclipse/${sdate}/`},
                     }
                     return row;
                 });

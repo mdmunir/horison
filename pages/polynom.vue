@@ -148,7 +148,7 @@
                     this.output = 'Err: Object tidak diketahui.';
                     return;
                 }
-                let T0 = (this.model.from || moment().format('YYYY-MM-DD [00:00:00]')).toDate();
+                let T0 = (this.model.T0 || moment().format('YYYY-MM-DD [00:00:00]')).toDate();
                 let begin = (this.model.from || moment().format('YYYY-MM-DD [00:00:00]')).toDate();
                 let end = (this.model.to || moment().format('YYYY-MM-DD [23:59:59.99]')).toDate();
                 if (T0 && begin && end) {

@@ -1,5 +1,5 @@
 <template>
-    <lte-content :title="false">
+    <lte-content>
         <h5>{{latLon}}</h5>
         <div class="row">
             <div class="col-md-2 col-4" v-for="item in times">

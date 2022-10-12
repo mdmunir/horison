@@ -44,7 +44,6 @@ const m = {
         '~/components',
         {path: '~/components/adminlte/', prefix: 'lte'},
         {path: '~/components/app/', prefix: 'a'},
-        {path: '~/components/app/se', prefix: 'se'},
     ],
 
     // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules

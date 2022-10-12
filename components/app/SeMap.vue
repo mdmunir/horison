@@ -7,10 +7,14 @@
     import {sincos} from 'astronomia/src/base';
     import {generateGIF} from '@/libs/gif-generator';
     import vertexShader from '!raw-loader!./webgl/vertex.c';
-    import fragmentShader from '!raw-loader!./webgl/fragment.c';
+    import fragmentShader from '!raw-loader!./webgl/se-fragment.c';
 
     export default{
         props: {
+            type: {
+                type: String,
+                default: 'globe',
+            },
             texture: {
                 type: [String, Object],
                 default: 'images/earth_1600.jpg',
@@ -22,7 +26,7 @@
                 },
             },
             cameraPos: Object,
-            zoom: {
+            scale: {
                 type: Number,
                 default: 100,
             },
@@ -31,62 +35,66 @@
                 default: true,
             }
         },
-        created() {
+        data() {
             var padding = 0.05;
-            this.camera = new THREE.OrthographicCamera(-1 - padding, 1 + padding, 1 + padding, -1 - padding, 0.1, 10);
-            this.camera.position.set(0, 0, 4);
-            this.controls = null;
-            this.scene = new THREE.Scene();
-            this.sphere = new THREE.SphereGeometry(1, 128, 64);
-            var renderer = new THREE.WebGLRenderer();
-            renderer.setPixelRatio(window.devicePixelRatio);
-            renderer.setPixelRatio(window.devicePixelRatio);
-            this.renderer = renderer;
-
-            this.animated = true;
-        },
-        mounted() {
-            var th = this;
+            const models = {
+                globe: new THREE.SphereGeometry(1, 128, 64),
+                mer: new THREE.PlaneGeometry(2, 2),
+                ae: new THREE.CircleGeometry(1, 64),
+            };
             this.uniform.txtr = {value: new THREE.TextureLoader().load(this.texture)};
-
-            var material = new THREE.ShaderMaterial({
+            this.uniform.isAe = {value: this.type == 'ae' ? 1 : 0};
+            const material = new THREE.ShaderMaterial({
                 uniforms: this.uniform,
                 vertexShader: vertexShader,
                 fragmentShader: fragmentShader,
             });
-            var mesh = new THREE.Mesh(this.sphere, material);
-            mesh.position.x = 0;
-            mesh.position.y = 0;
-            this.scene.add(mesh);
 
+            const data = {
+                animated: true,
+                camera: new THREE.OrthographicCamera(-1 - padding, 1 + padding, 1 + padding, -1 - padding, 0.1, 10),
+                controls: null,
+                scene: new THREE.Scene(),
+                renderer: new THREE.WebGLRenderer(),
+                models: models,
+                material: material,
+                mesh: new THREE.Mesh(models[this.type], material),
+            };
+            data.camera.position.set(0, 0, 4);
+            data.renderer.setPixelRatio(window.devicePixelRatio);
+            data.mesh.position.x = 0;
+            data.mesh.position.y = 0;
+            data.scene.add(data.mesh);
+
+            return data;
+        },
+        mounted() {
+            var th = this;
             this.$el.appendChild(this.renderer.domElement);
 
-            // initialise trackball
-            var controls = this.controls = new OrbitControls(this.camera, this.$el);
-            controls.rotateSpeed = 1.0;
-            controls.zoomSpeed = 1.2;
-            controls.panSpeed = 0.8;
-            controls.noZoom = true;
-            controls.enableZoom = false;
-            controls.enablePan = false;
-            controls.noPan = true;
-            controls.staticMoving = true;
-            controls.dynamicDampingFactor = 0.3;
-            controls.keys = [65, 83, 68];
-            controls.addEventListener('change', function () {
-                th.render();
+            this.animate();
+            this.resize();
+            this.$nuxt.$on('pushmenu-click', function () {
+                th.resize(300);
             });
-            controls.enabled = this.control;
-
             window.addEventListener('resize', function () {
                 th.resize();
             });
 
-            this.animate();
-            th.resize();
-            this.$nuxt.$on('pushmenu-click', function () {
-                th.resize(300);
+            var controls = this.controls = new OrbitControls(this.camera, this.$el);
+            controls.rotateSpeed = 1.0;
+            controls.zoomSpeed = 1.2;
+            controls.panSpeed = 0.8;
+            controls.enableZoom = false;
+            controls.enablePan = false;
+            controls.staticMoving = true;
+            controls.dynamicDampingFactor = 0.3;
+            controls.keys = [65, 83, 68];
+            controls.autoRotate = false;
+            controls.addEventListener('change', function () {
+                th.render();
             });
+            controls.enableRotate = this.control && this.type == 'globe';
         },
         methods: {
             render() {
@@ -104,18 +112,18 @@
                     th.render();
                 }
             },
+            doScale(v) {
+                let scale = Math.min(100, Math.max(10, v));
+                let width = Math.floor(this.$el.offsetWidth * scale / 100);
+                let height = this.type == 'mer' ? width / 2 : width;
+                this.renderer.setSize(width, height);
+            },
             resize(time = 0) {
                 let th = this;
                 setTimeout(function () {
                     th.camera.aspect = 1;
                     th.camera.updateProjectionMatrix();
-                    let zoom = Math.min(100, Math.max(10, th.zoom));
-                    let width = Math.floor(th.$el.offsetWidth * zoom / 100);
-                    th.renderer.setSize(width, width);
-
-                    if (th.controls) {
-                        //this.controls.handleResize();
-                    }
+                    th.doScale(th.scale);
                 }, time);
             },
             async download(callback, options = {}) {
@@ -123,7 +131,7 @@
                 this.animated = false;
                 var buffer = await generateGIF(this.renderer.domElement, function (progress) {
                     if (callback) {
-                        if(callback(progress) === false){
+                        if (callback(progress) === false) {
                             return false;
                         }
                     }
@@ -134,7 +142,7 @@
 
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
-                link.download =  options.filename || 'solar-eclipse.gif';
+                link.download = options.filename || 'solar-eclipse.gif';
                 link.dispatchEvent(new MouseEvent('click'));
             }
         },
@@ -142,20 +150,37 @@
             cameraPos: {
                 deep: true,
                 handler(value) {
+                    if (this.type != 'globe') {
+                        return;
+                    }
                     let v = value || {};
                     const [slon, clon] = sincos(v.lon || 0);
                     const [slat, clat] = sincos(v.lat || 0);
                     const r = v.distance || 4;
                     this.camera.position.set(r * clat * clon, r * slat, r * clat * slon);
+                    if (this.controls) {
+                        this.controls.update();
+                    }
+                    this.render();
                 }
             },
-            zoom(v) {
-                let zoom = Math.min(100, Math.max(10, v));
-                let width = Math.floor(this.$el.offsetWidth * zoom / 100);
-                this.renderer.setSize(width, width);
+            scale(v) {
+                this.doScale(v);
+                this.render();
+            },
+            type(v) {
+                this.mesh.geometry = this.models[v];
+                this.uniform.isAe.value = (v == 'ae' ? 1 : 0);
+                this.doScale(this.scale);
+                this.controls.enableRotate = this.control && v == 'globe';
+                if (v != 'globe') {
+                    this.camera.position.set(0, 0, 4);
+                }
+                this.render();
             },
             control(v) {
-                this.controls.enabled = v;
+                this.controls.enableRotate = (v && this.type == 'globe');
+                this.render();
             }
         }
     }

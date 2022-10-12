@@ -43,7 +43,7 @@
         },
         computed: {
             showHeader() {
-                return this.$props.title || this.$props.buttons || this.$slots.tools;
+                return this.$props.title || this.toolButtons.length || this.$slots.tools;
             },
             showFooter() {
                 return this.$slots.footer;
