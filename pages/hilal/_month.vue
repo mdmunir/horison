@@ -59,7 +59,7 @@
             children() {
                 const parent = 'hilal-month';
                 const children = [
-                    {name: '', label: 'Info'},
+                    {name: '', label: 'Hilal Lokal'},
                     {name: 'id', label: 'Wilayah Indonesia'},
                     {name: 'map', label: 'Peta'},
                 ];
