@@ -3,7 +3,7 @@
         <div class="col-12">
             <lte-card title="Info" >
                 <template #tools>
-                    <a v-if="rowsStr" class="btn btn-tool" :href="contentDownload" download="hilal-wilayah-indonesia.txt">
+                    <a v-if="rowsStr" class="btn btn-tool" :href="contentDownload" download="hilal-lokal.txt">
                         <i class="fas fa-save"></i>
                     </a>
                 </template>
@@ -14,7 +14,7 @@
 </template>
 
 <script>
-    import {R2D, D2R, Globe, now} from '@/libs/horison';
+    import {R2D, D2R, Globe} from '@/libs/horison';
     import base from 'astronomia/src/base';
 
     const {floor, PI, sin, cos, asin, acos, atan, atan2} = Math;
@@ -38,7 +38,7 @@
 Lokasi              : ${globe}
 Bulan               : ${this.monthName}
 Konjungsi(VSOP&ELP) : ${moment(conjunction.toDate()).utc().format('YYYY-MM-DD HH:mm:ss.S')} UT
-                    : ${moment(conjunction.toDate()).utcOffset(timezone).format('YYYY-MM-DD HH:mm:ss.S')} UTC ${zone}
+                    : ${moment(conjunction.toDate()).utcOffset(offset).format('YYYY-MM-DD HH:mm:ss.S')} UTC ${zone}
 Konjungsi(Meeus)    : ${moment(meeusConjunction.toDate()).utc().format('YYYY-MM-DD HH:mm:ss.S')} UT
 Konjungsi(Ekuator)  : ${moment(equatorConjunction.toDate()).utc().format('YYYY-MM-DD HH:mm:ss.S')} UT
 `;
