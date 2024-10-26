@@ -46,7 +46,7 @@
       "purpose": "any maskable"
     }
   ],
-  "start_url": "/horison/",
+  "start_url": "/horison",
   "display": "standalone",
   "background_color": "#ffffff",
   "lang": "en"
