@@ -1,4 +1,4 @@
-const DEPLOY_PATH = process.env.NODE_ENV === "development" ? '/' : (process.env.DEPLOY_PATH || '/horison/');
+const DEPLOY_PATH = process.env.DEPLOY_PATH || '';
 
 const m = {
     // Disable server-side rendering: https://go.nuxtjs.dev/ssr-mode
@@ -11,20 +11,20 @@ const m = {
     head: {
         title: 'Horison',
         meta: [
-            {charset: 'UTF-8'},
-            {name: 'viewport', content: 'width=device-width, initial-scale=1'},
-            {hid: 'description', name: 'description', content: ''},
-            {name: 'format-detection', content: 'telephone=no'}
+            { charset: 'UTF-8' },
+            { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+            { hid: 'description', name: 'description', content: '' },
+            { name: 'format-detection', content: 'telephone=no' }
         ],
         link: [
-            {rel: 'icon', type: 'image/x-icon', href: `${DEPLOY_PATH}favicon.ico`},
-            {rel: 'stylesheet', href: 'https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700'},
-            {rel: 'stylesheet', href: 'https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css'},
+            { rel: 'icon', type: 'image/x-icon', href: `${DEPLOY_PATH}/favicon.ico` },
+            { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700' },
+            { rel: 'stylesheet', href: 'https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css' },
         ],
         script: [
         ],
         bodyAttrs: {
-            class: 'hold-transition sidebar-mini layout-fixed layout-navbar-fixedx layout-footer-fixed'
+            class: 'hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed'
         }
     },
 
@@ -42,8 +42,8 @@ const m = {
     // Auto import components: https://go.nuxtjs.dev/config-components
     components: [
         '~/components',
-        {path: '~/components/adminlte/', prefix: 'lte'},
-        {path: '~/components/app/', prefix: 'a'},
+        { path: '~/components/adminlte/', prefix: 'lte' },
+        { path: '~/components/app/', prefix: 'a' },
     ],
 
     // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
@@ -76,26 +76,26 @@ const m = {
         },
         workbox: {
             importScripts: [
-                `${DEPLOY_PATH}dist/precache.js`,
+                `${DEPLOY_PATH}/dist/precache.js`,
             ],
             runtimeCaching: [
                 {
                     urlPattern: 'https://fonts.googleapis.com/.*',
                     handler: 'cacheFirst',
                     method: 'GET',
-                    strategyOptions: {cacheableResponse: {statuses: [0, 200]}}
+                    strategyOptions: { cacheableResponse: { statuses: [0, 200] } }
                 },
                 {
                     urlPattern: 'https://fonts.gstatic.com/.*',
                     handler: 'cacheFirst',
                     method: 'GET',
-                    strategyOptions: {cacheableResponse: {statuses: [0, 200]}}
+                    strategyOptions: { cacheableResponse: { statuses: [0, 200] } }
                 },
                 {
                     urlPattern: /\.(eot|svg|ttf|woff|woff2)$/,
                     handler: 'cacheFirst',
                     method: 'GET',
-                    strategyOptions: {cacheableResponse: {statuses: [0, 200]}}
+                    strategyOptions: { cacheableResponse: { statuses: [0, 200] } }
                 },
             ]
         }
@@ -108,22 +108,22 @@ const m = {
     build: {
     },
     router: {
-        base: DEPLOY_PATH,
+        base: DEPLOY_PATH + '/',
         mode: 'hash',
     }
 }
 
-const precaches = [{url: DEPLOY_PATH + '?'}];
+const precaches = [{ url: DEPLOY_PATH + '/?' }];
 const revision = null;
 
 m.head.link.forEach(link => {
     if (link.rel == 'stylesheet') {
-        precaches.push({url: link.href, revision});
+        precaches.push({ url: link.href, revision });
     }
 });
 m.head.script.forEach(script => {
     if (script.src) {
-        precaches.push({url: script.src, revision});
+        precaches.push({ url: script.src, revision });
     }
 });
 m.pwa.workbox.preCaching = precaches;

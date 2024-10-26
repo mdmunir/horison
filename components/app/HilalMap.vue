@@ -17,7 +17,7 @@
             },
             texture: {
                 type: [String, Object],
-                default: 'images/earth_1600.jpg',
+                default: 'images/earth_white_1280.png',
             },
             uniform: {
                 type: Object,

@@ -247,8 +247,8 @@ export class Eclipse {
             return distance - r;
         }
         info.tMax = tMax;
-        info.p1 = iterate.binaryRoot(func, -3, tMax);
-        info.p4 = iterate.binaryRoot(func, tMax, 3);
+        info.p1 = iterate.binaryRoot(func, -5, tMax);
+        info.p4 = iterate.binaryRoot(func, tMax, 5);
     }
 
     calc(t) {
