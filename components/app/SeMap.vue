@@ -33,6 +33,10 @@
             control: {
                 type: Boolean,
                 default: true,
+            },
+            path: {
+                type: Boolean,
+                default: true,
             }
         },
         data() {
@@ -44,6 +48,7 @@
             };
             this.uniform.txtr = {value: new THREE.TextureLoader().load(this.texture)};
             this.uniform.isAe = {value: this.type == 'ae' ? 1 : 0};
+            this.uniform.isPath = {value: this.path ? 1 : 0};
             const material = new THREE.ShaderMaterial({
                 uniforms: this.uniform,
                 vertexShader: vertexShader,
@@ -176,6 +181,10 @@
                 if (v != 'globe') {
                     this.camera.position.set(0, 0, 4);
                 }
+                this.render();
+            },
+            path(v){
+                this.uniform.isPath.value = (v ? 1 : 0);
                 this.render();
             },
             control(v) {

@@ -36,9 +36,10 @@ let _args = process.argv.slice(2), file = _args.shift(), func,
 f1 = path.join(__dirname, 'script', `${file}.js`), f2 = path.join(__dirname, 'script', `${file}-local.js`);
 if (fs.existsSync(f1)) {
     func = require(f1);
-    return func.apply(null, extract(_args));
 } else if (fs.existsSync(f2)) {
     func = require(f2);
+}
+if(func && typeof(func) == 'function'){
     return func.apply(null, extract(_args));
 }
 
