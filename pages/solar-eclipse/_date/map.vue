@@ -31,16 +31,17 @@
                         </div>
                     </div>
                     <div class="col-4 col-lg-2" >
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" v-model="options.path" id="ck_rotation">
-                            <label class="form-check-label" for="ck_rotation">Path</label>
-                        </div>
+                        <select class="form-control" v-model="options.part">
+                            <option value="all">Path&Shadow</option>
+                            <option value="shadow">Shadow</option>
+                            <option value="path">Path</option>
+                        </select>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-12">
                         <a-se-map :type="options.model" ref="map" :scale="scale" :control="!options.rotation"
-                            :uniform="uniform" :camera-pos="cameraPos" :path="options.path"></a-se-map>
+                            :uniform="uniform" :camera-pos="cameraPos" :part="options.part"></a-se-map>
                     </div>
                 </div>
             </lte-card>
@@ -81,16 +82,9 @@ export default {
         return {
             deltaTMu,
             uniform: {
-                esq: { value: ESQ },
-                x: { value: 0 },
-                y: { value: 0 },
-                sind: { value: 0 },
-                cosd: { value: 0 },
-                mu: { value: 0 },
-                l1: { value: 0 },
-                l2: { value: 0 },
-                tanf1: { value: info.tanF1 },
-                tanf2: { value: info.tanF2 },
+                time:{value: 0},
+                tanF1: { value: info.tanF1 },
+                tanF2: { value: info.tanF2 },
                 deltaTMu: {value: deltaTMu},
                 X: { value: info.x.slice(0,4) },
                 Y: { value: info.y.slice(0,4) },
@@ -102,8 +96,6 @@ export default {
                 DY:{value: info.y.slice(1,5).map((v,i) => v*(i+1))},
                 DD:{value: info.d.slice(1,5).map((v,i) => v*(i+1))},
                 DMU:{value: info.μ.slice(1,5).map((v,i) => v*(i+1))},
-                //DL1:{value: info.l1.slice(1,5).map((v,i) => v*(i+1))},
-                //DL2:{value: info.l2.slice(1,5).map((v,i) => v*(i+1))},
             },
             slider: 500,
             cameraPos: {
@@ -115,7 +107,7 @@ export default {
             options: {
                 model: 'globe',
                 rotation: true,
-                path: true,
+                part: 'all',
             },
             save: {
                 progress: 0,
@@ -125,7 +117,7 @@ export default {
         }
     },
     mounted() {
-        this.updatePath(this.bessel);
+        this.updatePath(this.time);
     },
     methods: {
         run() {
@@ -143,21 +135,13 @@ export default {
                 }, 100);
             }
         },
-        updatePath(bessel) {
+        updatePath(time) {
             var uniforms2 = this.uniform;
-            uniforms2.x.value = bessel.x;
-            uniforms2.y.value = bessel.y;
-            uniforms2.mu.value = bessel.μ - this.deltaTMu;
-            uniforms2.sind.value = sin(bessel.d);
-            uniforms2.cosd.value = cos(bessel.d);
-            uniforms2.l1.value = bessel.l1;
-            uniforms2.l2.value = bessel.l2;
-            //uniforms2.tanf1.value = bessel.tanF1;
-            //uniforms2.tanf2.value = bessel.tanF2;
+            uniforms2.time.value = time;
 
             if (this.options.rotation) {
-                this.cameraPos.lon = bessel.μ;
-                this.cameraPos.lat = bessel.d;
+                this.cameraPos.lon = this.cameraLon;
+                this.cameraPos.lat = this.cameraLat;
             }
         },
         async simpan() {
@@ -184,24 +168,17 @@ export default {
         time() {
             const { p1, p4 } = this.info;
             return p1 + (p4 - p1) * this.slider / 1000;
-
         },
         sTime() {
             let jde = this.info.JDE0 + (this.time - this.info.deltaT / 3600) / 24;
             return moment(jde.toDate()).utc().format('DD MMMM YYYY, hh:mm:ss [UTC]');
-
         },
-        bessel() {
-            var t = this.time;
-            var info = this.info;
-            var result = {};
-            const names = ['x', 'y', 'μ', 'd', 'l1', 'l2'];
-            names.forEach(name => {
-                result[name] = horner(t, info[name]);
-            });
-            result.μ = pmod(result.μ, 2*PI);
-            return result;
-            //return this.eclipse.calc(this.time);
+        cameraLon(){
+            var result = horner(this.time, this.info.μ);
+            return pmod(result, 2 * PI);
+        },
+        cameraLat(){
+            return horner(this.time, this.info.d);
         },
         onPlay() {
             return this.intervalID != null;
@@ -210,13 +187,12 @@ export default {
     watch: {
         'options.rotation': function (v) {
             if (v) {
-                const bessel = this.bessel;
-                this.cameraPos.lon = bessel.μ;
-                this.cameraPos.lat = bessel.d;
+                this.cameraPos.lon = this.cameraLon;
+                this.cameraPos.lat = this.cameraLat;
             }
         },
         slider() {
-            this.updatePath(this.bessel);
+            this.updatePath(this.time);
         },
     }
 }

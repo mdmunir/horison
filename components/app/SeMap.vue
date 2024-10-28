@@ -34,9 +34,9 @@
                 type: Boolean,
                 default: true,
             },
-            path: {
-                type: Boolean,
-                default: true,
+            part: {
+                type: String,
+                default: 'all',
             }
         },
         data() {
@@ -48,7 +48,8 @@
             };
             this.uniform.txtr = {value: new THREE.TextureLoader().load(this.texture)};
             this.uniform.isAe = {value: this.type == 'ae' ? 1 : 0};
-            this.uniform.isPath = {value: this.path ? 1 : 0};
+            this.uniform.isPath = {value: this.part != 'shadow' ? 1 : 0};
+            this.uniform.isShadow = {value: this.part != 'path' ? 1 : 0};
             const material = new THREE.ShaderMaterial({
                 uniforms: this.uniform,
                 vertexShader: vertexShader,
@@ -183,8 +184,9 @@
                 }
                 this.render();
             },
-            path(v){
-                this.uniform.isPath.value = (v ? 1 : 0);
+            part(v){
+                this.uniform.isPath.value = (v != 'shadow' ? 1 : 0);
+                this.uniform.isShadow.value = (v != 'path' ? 1 : 0);
                 this.render();
             },
             control(v) {
